@@ -9,7 +9,7 @@
 @media (prefers-color-scheme:dark){:root{--bg:#1b1b1a;--ink:#eceae4;--mute:#a19f98;--line:#3a3936;--shelfline:#4a4945;--desk:#3a3834;--bezel:#0c0c0d;--card:#262624}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif}
-main{max-width:1640px;margin:0 auto;padding:28px 20px 40px}
+main{margin:0;padding:0}
 .pill{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:5px 12px;cursor:pointer}
 .legend{display:flex;flex-wrap:wrap;gap:16px;font-size:13px;color:var(--mute);margin:0 0 10px}
 .legend span{display:flex;align-items:center;gap:6px}
@@ -41,8 +41,9 @@ svg{display:block;width:100%;height:auto}
 .key i{width:16px;height:11px;border-radius:2px;display:inline-block}
 .duo>div:nth-child(2){border-left:1px solid var(--line)}
 @media (max-width:1100px){.duo{grid-template-columns:1fr}.duo>div:nth-child(2){border-left:0;border-top:1px solid var(--line)}.duo>div,.duo svg{height:auto}.duo>.foot{grid-template-columns:1fr}.foot>.legend{border-left:0;border-top:1px solid var(--line)}}
-.layout{display:grid;grid-template-columns:290px minmax(0,1fr);gap:24px;align-items:start}
-.side{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;position:sticky;top:16px;max-height:calc(100vh - 32px);overflow:auto}
+.layout{display:grid;grid-template-columns:290px minmax(0,1fr);align-items:start}
+.content{padding:20px;min-width:0}
+.side{background:var(--card);border-right:1px solid var(--line);padding:16px;position:sticky;top:0;height:100vh;overflow:auto}
 .sec{border-top:1px solid var(--line);margin-top:16px;padding-top:14px}
 .sec h3{font-size:15px;margin:0 0 10px}
 .fld{margin-bottom:12px}
@@ -69,7 +70,7 @@ svg{display:block;width:100%;height:auto}
 #opts .none{padding:6px 8px;font-size:13px;color:var(--mute)}
 .side #picks{flex-direction:column;gap:4px;margin:0}
 .side #picks button{border-radius:8px;justify-content:flex-start;text-align:left}
-@media (max-width:900px){.layout{grid-template-columns:1fr}.side{position:static;max-height:none;overflow:visible}}
+@media (max-width:900px){.layout{grid-template-columns:1fr}.side{position:static;height:auto;overflow:visible;border-right:0;border-bottom:1px solid var(--line)}.content{padding:16px}}
 </style>
 </head>
 <body>
