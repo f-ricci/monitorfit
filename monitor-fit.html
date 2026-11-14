@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Monitor fit on your desk</title>
 <style>
-:root{--bg:#f7f6f3;--ink:#1d1d1b;--mute:#6b6a66;--line:#d8d6cf;--wall:#efede8;--shelf:#ffffff;--shelfline:#c9c6bd;--desk:#e4e1da;--door:#fbfaf7;--bezel:#1f1f22;--card:#fff;--ok:#2e8b57;--warn:#c77700;--bad:#c0392b}
-@media (prefers-color-scheme:dark){:root{--bg:#1b1b1a;--ink:#eceae4;--mute:#a19f98;--line:#3a3936;--wall:#242422;--shelf:#2f2f2c;--shelfline:#4a4945;--desk:#3a3834;--door:#2b2b28;--bezel:#0c0c0d;--card:#262624}}
+:root{--bg:#f7f6f3;--ink:#1d1d1b;--mute:#6b6a66;--line:#d8d6cf;--shelfline:#c9c6bd;--desk:#e4e1da;--bezel:#1f1f22;--card:#fff;--ok:#2e8b57;--warn:#c77700;--bad:#c0392b}
+@media (prefers-color-scheme:dark){:root{--bg:#1b1b1a;--ink:#eceae4;--mute:#a19f98;--line:#3a3936;--shelfline:#4a4945;--desk:#3a3834;--bezel:#0c0c0d;--card:#262624}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif}
 main{max-width:1100px;margin:0 auto;padding:28px 20px 40px}
@@ -28,6 +28,10 @@ h1{font-size:26px;margin:0 0 4px;letter-spacing:-.01em}
 .seg button{font:inherit;font-size:13px;border:0;background:var(--card);color:var(--ink);padding:6px 12px;cursor:pointer}
 .seg button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
 input[type=range]{width:220px}
+select{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:6px 10px}
+.bar label.chip{font-size:13px;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:5px 12px;cursor:pointer;display:flex;align-items:center;gap:6px}
+.bar label.chip .sw{width:10px;height:10px;border-radius:3px}
+.bar label.chip:has(input:checked){border-color:var(--ink)}
 label.ck{display:flex;gap:6px;align-items:center;cursor:pointer}
 .stage{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px;overflow:hidden}
 svg{display:block;width:100%;height:auto}
@@ -44,27 +48,30 @@ svg{display:block;width:100%;height:auto}
 <body>
 <main>
 <h1>Which monitor fits between the shelf and the door frame?</h1>
-<p class="sub">Front view of your desk, to scale, measured from your photo using the ASUS ProArt 27" 4K (612 mm wide) as the ruler. Pick a monitor to see it in place; the dashed outline is the 27" you have now.</p>
+<p class="sub">Front view of your desk, to scale, measured from your photo using the ASUS ProArt 27" 4K (612 mm wide) as the ruler. Pick a monitor to see it in place; the dashed outline is your monitor.</p>
 
+<div class="row"><span>My monitor</span><select id="mine" aria-label="My monitor"></select></div>
+<div class="row"><span>Selected for comparison</span><div class="bar" id="cmp" style="margin:0"></div></div>
 <div class="bar" id="picks"></div>
 <div class="row">
-  <span>Position</span>
+  <span>Anchor to my monitor</span>
   <div class="seg" id="pos">
-    <button data-p="centre" aria-pressed="true">Centred where the 27" is</button>
-    <button data-p="shelf" aria-pressed="false">Pushed against the shelf</button>
-    <button data-p="free" aria-pressed="false">Slide</button>
+    <button data-p="bc" aria-pressed="true">Bottom centre</button>
+    <button data-p="bl" aria-pressed="false">Bottom left</button>
+    <button data-p="tl" aria-pressed="false">Top left</button>
+    <button data-p="tr" aria-pressed="false">Top right</button>
+    <button data-p="br" aria-pressed="false">Bottom right</button>
   </div>
-  <input type="range" id="slide" min="-500" max="500" step="5" value="0" aria-label="Shift left or right">
-  <label class="ck"><input type="checkbox" id="ghost" checked> Show current 27"</label>
+  <label class="ck"><input type="checkbox" id="ghost" checked> Show my monitor</label>
 </div>
 
-<div class="stage"><svg id="svg" viewBox="-820 -700 1820 710" role="img" aria-label="Front view of the selected monitor with its dimensions"></svg></div>
+<div class="stage"><svg id="svg" role="img" aria-label="Front view of the selected monitor with its dimensions"></svg></div>
 
 <div class="stats">
   <div class="stat"><div class="k">Monitor body (no stand)</div><div class="v" id="sSize"></div><div class="n" id="sPanel"></div></div>
-  <div class="stat"><div class="k">Left: to the shelf</div><div class="v" id="sL"></div><div class="n" id="sLn"></div></div>
-  <div class="stat"><div class="k">Right: to the door frame</div><div class="v" id="sR"></div><div class="n" id="sRn"></div></div>
-  <div class="stat"><div class="k">Top edge above desk</div><div class="v" id="sT"></div><div class="n" id="sTn"></div></div>
+  <div class="stat"><div class="k">Width vs yours</div><div class="v" id="sW"></div><div class="n" id="sWn"></div></div>
+  <div class="stat"><div class="k">Height vs yours</div><div class="v" id="sH"></div><div class="n" id="sHn"></div></div>
+  <div class="stat"><div class="k">Screen area vs yours</div><div class="v" id="sA"></div><div class="n" id="sAn"></div></div>
 </div>
 
 <h2>Seen from your chair</h2>
@@ -76,11 +83,13 @@ svg{display:block;width:100%;height:auto}
     <button data-d="700" aria-pressed="true">70 cm</button>
     <button data-d="800" aria-pressed="false">80 cm</button>
   </div>
+  <span>Desk width</span>
+  <input type="range" id="dw" min="100" max="300" step="5" value="240" aria-label="Desk width"><span id="dwv"></span>
   <span>Eyes behind desk edge</span>
   <input type="range" id="eye" min="100" max="500" step="10" value="250" aria-label="Eye distance behind the desk edge"><span id="eyev"></span>
   <span>Angle</span>
   <input type="range" id="yaw" min="-55" max="55" step="1" value="28" aria-label="Rotate the view">
-  <label class="ck"><input type="checkbox" id="ighost" checked> Show current 27"</label>
+  <label class="ck"><input type="checkbox" id="ighost" checked> Show my monitor</label>
 </div>
 <div class="row">
   <span>Where you look</span>
@@ -109,83 +118,127 @@ svg{display:block;width:100%;height:auto}
 
 <script>
 var M=[
- {id:"pa27",sd:215,R:0,name:'ProArt 27" 4K (yours)',bw:612.2,bh:362.9,pw:596.7,ph:335.7,c:"#C2459B",curve:"flat",res:"3840 × 2160"},
- {id:"pa32",sd:245,R:0,name:'ProArt 32" 4K',bw:727.1,bh:429,pw:708.5,ph:398.5,c:"#F28C28",curve:"flat",res:"3840 × 2160",est:1},
- {id:"lg34",sd:220,R:1800,name:'LG 34U620B-B 34"',bw:809,bh:359,pw:797.2,ph:333.7,c:"#17A2B8",curve:"1800R",res:"3440 × 1440"},
- {id:"pa34",sd:240,R:3800,name:'ProArt PA34VCNV 34"',bw:817.2,bh:369.7,pw:799.8,ph:334.8,c:"#8A8A8A",curve:"3800R",res:"3440 × 1440"},
- {id:"d40",sd:252.8,R:2500,name:'Dell U4025QW 40"',bw:946.6,bh:419.1,pw:929,ph:392,c:"#E0B000",curve:"2500R",res:"5120 × 2160"},
- {id:"lg49",sd:260,R:3800,name:'LG 49U950A 49"',bw:1215.1,bh:365.7,pw:1198,ph:337,c:"#7C5CBF",curve:"3800R",res:"5120 × 1440"},
- {id:"d52",sd:255,R:4200,name:'Dell U5226KW 52"',bw:1223.3,bh:529.1,pw:1207,ph:503,c:"#2F7CC4",curve:"4200R",res:"6144 × 2560"}
+ {id:"pa27",sd:215,R:0,name:'ProArt 27" 4K',bw:612.2,bh:362.9,pw:596.7,ph:335.7,curve:"flat",res:"3840 × 2160"},
+ {id:"pa32",sd:245,R:0,name:'ProArt 32" 4K',bw:727.1,bh:429,pw:708.5,ph:398.5,curve:"flat",res:"3840 × 2160",est:1},
+ {id:"lg34",sd:220,R:1800,name:'LG 34U620B-B 34"',bw:809,bh:359,pw:797.2,ph:333.7,curve:"1800R",res:"3440 × 1440"},
+ {id:"pa34",sd:240,R:3800,name:'ProArt PA34VCNV 34"',bw:817.2,bh:369.7,pw:799.8,ph:334.8,curve:"3800R",res:"3440 × 1440"},
+ {id:"d40",sd:252.8,R:2500,name:'Dell U4025QW 40"',bw:946.6,bh:419.1,pw:929,ph:392,curve:"2500R",res:"5120 × 2160"},
+ {id:"lg49",sd:260,R:3800,name:'LG 49U950A 49"',bw:1215.1,bh:365.7,pw:1198,ph:337,curve:"3800R",res:"5120 × 1440"},
+ {id:"d52",sd:255,R:4200,name:'Dell U5226KW 52"',bw:1223.3,bh:529.1,pw:1207,ph:503,curve:"4200R",res:"6144 × 2560"}
 ];
-var SHELF=-351, TRIM=331, DOOR=450, LIFT=92, CUR=M[0];
-var st={m:"pa27",pos:"centre",shift:0,ghost:true};
+var LIFT=92;
+// my monitor keeps one colour; compared monitors draw from a palette of 30 distinct colours (Glasbey)
+var MINE_COLOR="#C2459B", PALETTE=["#d60000","#8c3bff","#018700","#00acc6","#97ff00","#ff7ed1","#6b004f","#ffa52f","#573b00","#005659","#0000dd","#00fdcf","#a17569","#bcb6ff","#95b577","#002e6b","#645474","#790000","#0774d8","#fdf490","#004b00","#8e7900","#ff7266","#edb8b8","#5d7e66","#9ae4ff","#eb0077","#a57bb8","#5900a3","#03c600"];
+var st={m:"pa27",colors:{},mine:"pa27",compare:M.map(function(m){return m.id}),pos:"bc",ghost:true};
 var NS="http://www.w3.org/2000/svg", svg=document.getElementById("svg");
 function el(t,a,p){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);(p||svg).appendChild(e);return e}
 function tx(x,y,s,a){var e=el("text",Object.assign({x:x,y:y,"font-size":22,fill:"var(--mute)","font-family":"inherit"},a||{}));e.textContent=s;return e}
 function cm(mm){return (Math.round(mm/10*10)/10).toFixed(1).replace(/\.0$/,"")+" cm"}
-function cur(){return M.filter(function(m){return m.id===st.m})[0]}
-function left(m){
-  if(st.pos==="shelf")return SHELF+10;
-  if(st.pos==="free")return -m.bw/2+st.shift;
-  return -m.bw/2;
+function byId(id){return M.filter(function(m){return m.id===id})[0]}
+function cur(){return byId(st.m)}
+function mine(){return byId(st.mine)}
+function colorOf(m){return m.id===st.mine?MINE_COLOR:st.colors[m.id]||"var(--line)"}
+// give each compared monitor a random palette colour no other compared monitor has
+function assignColors(){
+  for(var id in st.colors)if(st.compare.indexOf(id)<0)delete st.colors[id];
+  st.compare.forEach(function(id){
+    if(st.colors[id])return;
+    var used=Object.keys(st.colors).map(function(k){return st.colors[k]}),free=PALETTE.filter(function(c){return used.indexOf(c)<0});
+    if(!free.length)free=PALETTE;
+    st.colors[id]=free[Math.floor(Math.random()*free.length)];
+  });
 }
-function dim(x1,x2,y,label){
-  el("line",{x1:x1,y1:y,x2:x2,y2:y,stroke:"var(--ink)","stroke-width":2});
-  el("line",{x1:x1,y1:y-10,x2:x1,y2:y+10,stroke:"var(--ink)","stroke-width":2});
-  el("line",{x1:x2,y1:y-10,x2:x2,y2:y+10,stroke:"var(--ink)","stroke-width":2});
-  tx((x1+x2)/2,y-10,label,{"text-anchor":"middle",fill:"var(--ink)","font-weight":600});
+// st.pos names the point of my monitor the compared one shares: b/t + l/c/r
+function left(m){var y=mine();return st.pos[1]==="l"?-y.bw/2:st.pos[1]==="c"?-m.bw/2:y.bw/2-m.bw}
+function base(m){var y=mine();return st.pos[0]==="b"?LIFT:LIFT+y.bh-m.bh}
+function dim(x1,x2,y,label,c){
+  c=c||"var(--ink)";
+  el("line",{x1:x1,y1:y,x2:x2,y2:y,stroke:c,"stroke-width":2});
+  el("line",{x1:x1,y1:y-10,x2:x1,y2:y+10,stroke:c,"stroke-width":2});
+  el("line",{x1:x2,y1:y-10,x2:x2,y2:y+10,stroke:c,"stroke-width":2});
+  tx((x1+x2)/2,y-10,label,{"text-anchor":"middle",fill:c,"font-weight":600});
 }
-function monitor(m,x,ghost){
-  var y=-(LIFT+m.bh), g=el("g",{});
-  if(ghost){el("rect",{x:x,y:y,width:m.bw,height:m.bh,rx:6,fill:"none",stroke:m.c,"stroke-width":3,"stroke-dasharray":"12 9",opacity:.9},g);return}
+function vdim(x,b,t,label,c,toLeft){
+  c=c||"var(--ink)";
+  el("line",{x1:x,y1:-b,x2:x,y2:-t,stroke:c,"stroke-width":2});
+  el("line",{x1:x-10,y1:-t,x2:x+10,y2:-t,stroke:c,"stroke-width":2});
+  el("line",{x1:x-10,y1:-b,x2:x+10,y2:-b,stroke:c,"stroke-width":2});
+  tx(x+(toLeft?-12:12),-(b+t)/2,label,{fill:c,"font-weight":600,"text-anchor":toLeft?"end":"start"});
+}
+function monitor(m,x,b,ghost){
+  var y=-(b+m.bh), foot=b-LIFT, g=el("g",{});
+  if(ghost){el("rect",{x:x,y:y,width:m.bw,height:m.bh,rx:6,fill:"none",stroke:colorOf(m),"stroke-width":3,"stroke-dasharray":"12 9",opacity:.9},g);return}
   var cx=x+m.bw/2;
-  el("rect",{x:cx-130,y:-10,width:260,height:10,rx:5,fill:"#9a9a9e"},g);
-  el("rect",{x:cx-30,y:-(LIFT+m.bh*0.55),width:60,height:LIFT+m.bh*0.55-6,fill:"#a7a7ab"},g);
+  el("rect",{x:cx-130,y:-foot-10,width:260,height:10,rx:5,fill:"#9a9a9e"},g);
+  el("rect",{x:cx-30,y:-(b+m.bh*0.55),width:60,height:LIFT+m.bh*0.55-6,fill:"#a7a7ab"},g);
   el("rect",{x:x,y:y,width:m.bw,height:m.bh,rx:6,fill:"var(--bezel)"},g);
   var side=(m.bw-m.pw)/2;
-  el("rect",{x:x+side,y:y+side,width:m.pw,height:m.ph,rx:2,fill:m.c,"fill-opacity":.32,stroke:m.c,"stroke-width":3},g);
+  el("rect",{x:x+side,y:y+side,width:m.pw,height:m.ph,rx:2,fill:colorOf(m),"fill-opacity":.32,stroke:colorOf(m),"stroke-width":3},g);
 }
+// fixed frame that fits any pair of monitors in any anchor, so the scale never changes
+var W1=Math.max.apply(0,M.map(function(m){return m.bw})),W0=Math.min.apply(0,M.map(function(m){return m.bw}));
+var H1=Math.max.apply(0,M.map(function(m){return m.bh})),H0=Math.min.apply(0,M.map(function(m){return m.bh}));
+var XMAX=W1-W0/2+60;
+svg.setAttribute("viewBox",[-XMAX-260,-(LIFT+H1)-150,2*XMAX+520,LIFT+H1+150+(H1-H0)+20].join(" "));
 function draw(){
   svg.textContent="";
-  var m=cur(), x=left(m), r=x+m.bw, top=LIFT+m.bh;
-  monitor(m,x,false);
-  if(st.ghost && m.id!=="pa27") monitor(CUR,-CUR.bw/2,true);
+  var m=cur(), x=left(m), r=x+m.bw, b=base(m), top=b+m.bh;
+  monitor(m,x,b,false);
+  if(st.ghost && m.id!==st.mine) monitor(mine(),-mine().bw/2,LIFT,true);
   // dims
-  dim(x,r,-top-40,cm(m.bw)+" wide");
-  var hx=r+30; if(hx>850)hx=x-30;
-  el("line",{x1:hx,y1:-LIFT,x2:hx,y2:-top,stroke:"var(--ink)","stroke-width":2});
-  el("line",{x1:hx-10,y1:-top,x2:hx+10,y2:-top,stroke:"var(--ink)","stroke-width":2});
-  el("line",{x1:hx-10,y1:-LIFT,x2:hx+10,y2:-LIFT,stroke:"var(--ink)","stroke-width":2});
-  tx(hx+(hx<x?-12:12),-LIFT-m.bh/2,cm(m.bh)+" tall",{fill:"var(--ink)","font-weight":600,"text-anchor":hx<x?"end":"start"});
-  stats(m,x,r,top);
+  var y=mine(), yl=-y.bw/2, yt=LIFT+y.bh, hi=-Math.max(top,yt), L=Math.min(x,yl), R=Math.max(r,-yl), onLeft=st.pos[1]!=="r";
+  dim(x,r,hi-40,cm(m.bw)+" wide");
+  vdim(onLeft?R+30:L-30,b,top,cm(m.bh)+" tall",null,!onLeft);
+  // my monitor's sizes in its own colour: width one row higher, height on the anchored side
+  if(st.ghost && m.id!==st.mine){
+    dim(yl,-yl,hi-95,cm(y.bw)+" wide (yours)",colorOf(y));
+    vdim(onLeft?L-30:R+30,LIFT,yt,cm(y.bh)+" tall (yours)",colorOf(y),onLeft);
+  }
+  stats(m);
 }
 function set(id,v,cls,n,nid){var e=document.getElementById(id);e.textContent=v;e.className="v "+(cls||"");document.getElementById(nid).textContent=n}
-function stats(m,x,r,top){
+function diff(mm){return mm===0?"Same":(mm>0?"+":"−")+cm(Math.abs(mm))}
+function stats(m){
+  var y=mine();
   set("sSize",cm(m.bw)+" × "+cm(m.bh),"",(m.res+" · "+(m.curve==="flat"?"flat":"curved "+m.curve)+(m.est?" · height estimated":"")),"sPanel");
-  var gl=x-SHELF;
-  if(gl>=0) set("sL",cm(gl)+" gap","ok","Clears the shelf","sLn");
-  else set("sL",cm(-gl)+" too wide","bad","Hits the shelf: slide it right","sLn");
-  var gr=TRIM-r;
-  if(gr>=0) set("sR",cm(gr)+" gap","ok","Clears the door frame","sRn");
-  else if(r<=DOOR) set("sR",cm(-gr)+" over","warn","In front of the door frame trim","sRn");
-  else set("sR",cm(r-DOOR)+" past","bad","Runs past the frame, in front of the door","sRn");
-  var d=top-(LIFT+CUR.bh);
-  set("sT",cm(top),"",d===0?"Same as now":(d>0?cm(d)+" taller than the 27\"":cm(-d)+" lower than the 27\""),"sTn");
+  set("sW",diff(m.bw-y.bw),"",m.bw>y.bw?"Wider than yours":m.bw<y.bw?"Narrower than yours":"Same width as yours","sWn");
+  set("sH",diff(m.bh-y.bh),"",m.bh>y.bh?"Taller than yours":m.bh<y.bh?"Shorter than yours":"Same height as yours","sHn");
+  var ar=m.pw*m.ph/(y.pw*y.ph);
+  set("sA",ar===1?"Same":Math.round(ar*100)+"%","",ar>1?"More screen than yours":ar<1?"Less screen than yours":"Same panel as yours","sAn");
 }
-var picks=document.getElementById("picks");
-M.forEach(function(m){
-  var b=document.createElement("button");b.setAttribute("aria-pressed",m.id===st.m);
-  var s=document.createElement("span");s.className="sw";s.style.background=m.c;b.appendChild(s);
-  b.appendChild(document.createTextNode(m.name));
-  b.onclick=function(){st.m=m.id;[].forEach.call(picks.children,function(c){c.setAttribute("aria-pressed",c===b)});draw()};
-  picks.appendChild(b);
-});
-var pos=document.getElementById("pos"), slide=document.getElementById("slide");
-[].forEach.call(pos.children,function(b){b.onclick=function(){var m=cur(),c0=Math.round(left(m)+m.bw/2);st.pos=b.dataset.p;[].forEach.call(pos.children,function(c){c.setAttribute("aria-pressed",c===b)});if(st.pos==="free"){st.shift=c0;slide.value=c0}draw()}});
-slide.oninput=function(){st.pos="free";st.shift=+slide.value;[].forEach.call(pos.children,function(c){c.setAttribute("aria-pressed",c.dataset.p==="free")});draw()};
+var picks=document.getElementById("picks"), mineSel=document.getElementById("mine"), cmp=document.getElementById("cmp");
+function sw(m){var s=document.createElement("span");s.className="sw";s.style.background=colorOf(m);return s}
+// my monitor first, then the ones selected for comparison
+function renderPicks(){
+  assignColors();
+  var shown=M.filter(function(m){return m.id===st.mine||st.compare.indexOf(m.id)>=0});
+  shown.sort(function(a,b){return (b.id===st.mine)-(a.id===st.mine)});
+  if(!shown.some(function(m){return m.id===st.m}))st.m=st.mine;
+  picks.textContent="";
+  shown.forEach(function(m){
+    var b=document.createElement("button");b.setAttribute("aria-pressed",m.id===st.m);
+    b.appendChild(sw(m));b.appendChild(document.createTextNode(m.name+(m.id===st.mine?" (yours)":"")));
+    b.onclick=function(){st.m=m.id;renderPicks();draw()};
+    picks.appendChild(b);
+  });
+  cmp.textContent="";
+  M.forEach(function(m){
+    if(m.id===st.mine)return;
+    var l=document.createElement("label");l.className="chip";
+    var c=document.createElement("input");c.type="checkbox";c.checked=st.compare.indexOf(m.id)>=0;
+    c.onchange=function(){st.compare=c.checked?st.compare.concat(m.id):st.compare.filter(function(id){return id!==m.id});renderPicks();draw()};
+    l.appendChild(c);l.appendChild(sw(m));l.appendChild(document.createTextNode(m.name));cmp.appendChild(l);
+  });
+}
+M.forEach(function(m){var o=document.createElement("option");o.value=m.id;o.textContent=m.name;mineSel.appendChild(o)});
+mineSel.value=st.mine;
+mineSel.onchange=function(){st.mine=mineSel.value;renderPicks();draw()};
+renderPicks();
+var pos=document.getElementById("pos");
+[].forEach.call(pos.children,function(b){b.onclick=function(){st.pos=b.dataset.p;[].forEach.call(pos.children,function(c){c.setAttribute("aria-pressed",c===b)});draw()}});
 document.getElementById("ghost").onchange=function(e){st.ghost=e.target.checked;draw()};
 
-var IS=document.getElementById("iso"), ist={D:700,eye:250,yaw:28,ghost:true,gy:null,gp:null,drag:false,lastM:null}, PITCH=32*Math.PI/180, WALLGAP=30, EYEH=450;
+var IS=document.getElementById("iso"), ist={D:700,W:2400,eye:250,yaw:28,ghost:true,gy:null,gp:null,drag:false,lastM:null}, PITCH=32*Math.PI/180, WALLGAP=30, EYEH=450;
 function E(t,a){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);IS.appendChild(e);return e}
 function P(x,y,h){var a=ist.yaw*Math.PI/180,sx=x*Math.cos(a)-y*Math.sin(a),dz=x*Math.sin(a)+y*Math.cos(a);return [sx,-h*Math.cos(PITCH)+dz*Math.sin(PITCH)]}
 function poly(pts,a){E("polygon",Object.assign({points:pts.map(function(p){var q=P(p[0],p[1],p[2]);return q[0].toFixed(1)+","+q[1].toFixed(1)}).join(" ")},a))}
@@ -202,24 +255,18 @@ function screenFace(m){var x=left(m),cx=x+m.bw/2,pz=WALLGAP+m.sd*0.6,R=m.R,N=24,
   return {pts:pts,cx:cx,pz:pz};}
 function drawIso(){
   IS.textContent="";var m=cur(),D=ist.D,eyeY=D+ist.eye;
-  var ext=[];[[-1250,0,-760],[1250,0,-760],[-1250,0,1300],[1250,0,1300],[-1250,1400,-760],[1250,1400,-760],[-1250,1400,600],[1250,1400,600]].forEach(function(p){ext.push(P(p[0],p[1],p[2]))});
-  var xs=ext.map(function(p){return p[0]}),ys=ext.map(function(p){return p[1]}),x0=Math.min.apply(0,xs),y0=Math.min.apply(0,ys);
-  IS.setAttribute("viewBox",[x0,y0,Math.max.apply(0,xs)-x0,Math.max.apply(0,ys)-y0].map(Math.round).join(" "));
-  var XL=-1200,XR=1200;
-  poly([[XL,0,-750],[XR,0,-750],[XR,0,1250],[XL,0,1250]],{fill:"var(--wall)",stroke:"var(--line)"});
-  poly([[TRIM,0,-750],[DOOR,0,-750],[DOOR,0,1250],[TRIM,0,1250]],{fill:"var(--door)",stroke:"var(--shelfline)","stroke-width":2});
-  poly([[DOOR,0,-750],[XR,0,-750],[XR,0,1250],[DOOR,0,1250]],{fill:"var(--door)",stroke:"var(--shelfline)","stroke-width":2});
-  poly([[XL,0,-750],[XR,0,-750],[XR,1500,-750],[XL,1500,-750]],{fill:"var(--line)",opacity:.35});
-  // desk
+  // frame: desk top, tallest monitor, chair at the deepest desk and furthest eyes
+  var XR=ist.W/2,XL=-XR,XE=Math.max(XR,XMAX)+50;
+  var ext=[];[-XE,XE].forEach(function(x){ext.push(P(x,0,0),P(x,1650,0),P(x,1650,-330))});
+  [-XMAX,XMAX].forEach(function(x){ext.push(P(x,0,LIFT+H1+60))});
+  var xs=ext.map(function(p){return p[0]}),ys=ext.map(function(p){return p[1]}),x0=Math.min.apply(0,xs)-60,y0=Math.min.apply(0,ys)-40;
+  IS.setAttribute("viewBox",[x0,y0,Math.max.apply(0,xs)+60-x0,Math.max.apply(0,ys)+40-y0].map(Math.round).join(" "));
+  // desk top
   box(XL,XR,0,D,-25,0,"var(--desk)");
-  [[XL+40,D-40],[XR-40,D-40]].forEach(function(l){box(l[0]-20,l[0]+20,l[1]-20,l[1]+20,-750,-25,"var(--desk)")});
-  // shelf
-  box(XL,SHELF,0,300,0,1250,"var(--shelf)");
-  [400,800].forEach(function(h){poly([[XL,300,h],[SHELF-18,300,h]],{stroke:"var(--shelfline)","stroke-width":3,fill:"none"})});
-  var f=screenFace(m),cx=f.cx,lowH=LIFT,topH=LIFT+m.bh,side=(m.bw-m.pw)/2;
+  var f=screenFace(m),cx=f.cx,lowH=base(m),topH=base(m)+m.bh,side=(m.bw-m.pw)/2;
   // stand
   box(cx-130,cx+130,WALLGAP,WALLGAP+m.sd,0,10,"#9a9a9e","#7d7d82");
-  box(cx-30,cx+30,f.pz-55,f.pz-25,10,LIFT+m.bh*0.55,"#a7a7ab","#7d7d82");
+  box(cx-30,cx+30,f.pz-55,f.pz-25,10,base(m)+m.bh*0.55,"#a7a7ab","#7d7d82");
   // back + face
   var back=f.pts.map(function(p){return [p[0],p[1]-35]});
   poly(back.map(function(p){return [p[0],p[1],lowH]}).concat(back.slice().reverse().map(function(p){return [p[0],p[1],topH]})),{fill:"#3a3b3f",stroke:"#2a2a2d"});
@@ -227,15 +274,15 @@ function drawIso(){
   poly(face,{fill:"var(--bezel)",stroke:"#000","stroke-width":1.5});
   var inner=f.pts.filter(function(p){return p[0]>=cx-m.pw/2-1&&p[0]<=cx+m.pw/2+1});
   inner[0]=[cx-m.pw/2,inner[0][1]];inner[inner.length-1]=[cx+m.pw/2,inner[inner.length-1][1]];
-  poly(inner.map(function(p){return [p[0],p[1]+1,topH-side-m.ph]}).concat(inner.slice().reverse().map(function(p){return [p[0],p[1]+1,topH-side]})),{fill:m.c,"fill-opacity":.45,stroke:m.c,"stroke-width":2.5});
-  // ghost of current 27"
-  if(ist.ghost && m.id!=="pa27"){var g=CUR,gz=WALLGAP+g.sd*0.6,gx=-g.bw/2,gh0=LIFT,gh1=LIFT+g.bh,gs={fill:"none",stroke:g.c,"stroke-width":3,"stroke-dasharray":"12 9"};
+  poly(inner.map(function(p){return [p[0],p[1]+1,topH-side-m.ph]}).concat(inner.slice().reverse().map(function(p){return [p[0],p[1]+1,topH-side]})),{fill:colorOf(m),"fill-opacity":.45,stroke:colorOf(m),"stroke-width":2.5});
+  // ghost of my monitor
+  if(ist.ghost && m.id!==st.mine){var g=mine(),gz=WALLGAP+g.sd*0.6,gx=-g.bw/2,gh0=LIFT,gh1=LIFT+g.bh,gs={fill:"none",stroke:colorOf(g),"stroke-width":3,"stroke-dasharray":"12 9"};
     poly([[gx,gz,gh0],[gx+g.bw,gz,gh0],[gx+g.bw,gz,gh1],[gx,gz,gh1]],gs);
     poly([[-130,WALLGAP,0],[130,WALLGAP,0],[130,WALLGAP+g.sd,0],[-130,WALLGAP+g.sd,0]],gs);
     line3([0,gz-40,0],[0,gz-40,gh0],gs);}
   // gaze zones over the panel
   if(ist.lastM!==m.id){ist.gy=null;ist.gp=null;ist.lastM=m.id}
-  var ex=cx,ey=eyeY,eh=EYEH,hb=topH-side-m.ph,ht=topH-side;
+  var ex=0,ey=eyeY,eh=EYEH,hb=topH-side-m.ph,ht=topH-side;
   var b0=m.R?m.R-Math.sqrt(m.R*m.R-m.bw*m.bw/4):0;
   function sy(x){var u=x-cx;return f.pz+(m.R?m.R-Math.sqrt(m.R*m.R-u*u):0)-b0/2+2}
   function dir(x,y,h){var dx=x-ex,dy=ey-y,dh=h-eh,n=Math.sqrt(dx*dx+dy*dy+dh*dh);return [dx/n,dy/n,dh/n]}
@@ -254,23 +301,23 @@ function drawIso(){
   }
   function look(x,y,h){var a=angs(x,y,h);ist.gy=Math.round(a[0]);ist.gp=Math.round(a[1]);drawIso()}
   var gaze=bestA<8?best:null;
-  // keyboard + mouse
-  box(cx-180,cx+180,D-230,D-100,0,22,"#2b2b2e","#1a1a1c");
-  box(cx+240,cx+300,D-210,D-110,0,30,"#d9d9dc","#aaa");
+  // keyboard + mouse, centred on the desk
+  box(-180,180,D-230,D-100,0,22,"#2b2b2e","#1a1a1c");
+  box(240,300,D-210,D-110,0,30,"#d9d9dc","#aaa");
   // chair
   var cy=eyeY+60;
-  box(cx-230,cx+230,cy-200,cy+230,-310,-250,"#55565a","#3c3d40");
-  box(cx-230,cx+230,cy+190,cy+240,-250,250,"#55565a","#3c3d40");
+  box(-230,230,cy-200,cy+230,-310,-250,"#55565a","#3c3d40");
+  box(-230,230,cy+190,cy+240,-250,250,"#55565a","#3c3d40");
   // sight lines
-  var eye=[cx,eyeY,EYEH],cH=topH-side-m.ph/2,L=inner[0],Rr=inner[inner.length-1],mid=f.pts[Math.floor(f.pts.length/2)];
+  var eye=[0,eyeY,EYEH],cH=topH-side-m.ph/2,L=inner[0],Rr=inner[inner.length-1],mid=f.pts[Math.floor(f.pts.length/2)];
   [[L[0],L[1],cH],[Rr[0],Rr[1],cH]].forEach(function(t){line3(eye,t,{stroke:"var(--ink)","stroke-width":2,"stroke-dasharray":"10 8"})});
   line3(eye,[mid[0],mid[1],cH],{stroke:"var(--ink)","stroke-width":1.5,opacity:.5});
   if(gaze){line3(eye,gaze,{stroke:"#e0a800","stroke-width":3});var gp2=P(gaze[0],gaze[1],gaze[2]);E("circle",{cx:gp2[0],cy:gp2[1],r:12,fill:"#e0a800",stroke:"#000","stroke-width":2})}
-  line3(eye,[cx,eyeY,-250],{stroke:"var(--ink)","stroke-width":2,"stroke-dasharray":"3 7",opacity:.6});var ep=P(eye[0],eye[1],eye[2]);E("circle",{cx:ep[0],cy:ep[1],r:14,fill:"var(--ink)"});
+  line3(eye,[0,eyeY,-250],{stroke:"var(--ink)","stroke-width":2,"stroke-dasharray":"3 7",opacity:.6});var ep=P(eye[0],eye[1],eye[2]);E("circle",{cx:ep[0],cy:ep[1],r:14,fill:"var(--ink)"});
   var t=E("text",{x:ep[0]-24,y:ep[1]+10,"text-anchor":"end","font-size":30,fill:"var(--ink)","font-weight":600});t.textContent="your eyes, 45 cm above the desk";
   // stats
-  var dist=Math.sqrt(Math.pow(eyeY-mid[1],2)+Math.pow(EYEH-cH,2));
-  var aL=Math.atan2(cx-L[0],eyeY-L[1]),aR=Math.atan2(Rr[0]-cx,eyeY-Rr[1]),ang=(aL+aR)*180/Math.PI;
+  var dist=Math.sqrt(Math.pow(mid[0],2)+Math.pow(eyeY-mid[1],2)+Math.pow(EYEH-cH,2));
+  var aL=Math.atan2(-L[0],eyeY-L[1]),aR=Math.atan2(Rr[0],eyeY-Rr[1]),ang=(aL+aR)*180/Math.PI;
   iset("iD",cm(dist),"","Desk "+(D/10)+" cm, eyes "+(ist.eye/10)+" cm back from the edge","iDn");
   var pc=Math.round(inReach/(NC*NR)*100);
   iset("iG",pc+"%",pc>=90?"ok":pc>=60?"warn":"bad",pc>=100?"All of it, from where you're looking":"Of the screen without turning your head","iGn");
@@ -280,10 +327,12 @@ function drawIso(){
   if(m.R){var r=m.R;iset("iC",(r/10)+" cm radius",Math.abs(r-dist)<r*0.4?"ok":"warn",dist<r?"You sit "+cm(r-dist)+" inside the curve's centre":"You sit "+cm(dist-r)+" beyond the curve's centre","iCn")}
   else iset("iC","Flat","","No curve to match","iCn");
   document.getElementById("eyev").textContent=(ist.eye/10)+" cm";
+  document.getElementById("dwv").textContent=(ist.W/10)+" cm";
 }
 function iset(id,v,cls,n,nid){var e=document.getElementById(id);e.textContent=v;e.className="v "+(cls||"");document.getElementById(nid).textContent=n}
 var depth=document.getElementById("depth");
 [].forEach.call(depth.children,function(b){b.onclick=function(){ist.D=+b.dataset.d;[].forEach.call(depth.children,function(c){c.setAttribute("aria-pressed",c===b)});drawIso()}});
+document.getElementById("dw").oninput=function(e){ist.W=+e.target.value*10;drawIso()};
 document.getElementById("eye").oninput=function(e){ist.eye=+e.target.value;drawIso()};
 document.getElementById("ighost").onchange=function(e){ist.ghost=e.target.checked;drawIso()};
 document.getElementById("yaw").oninput=function(e){ist.yaw=+e.target.value;drawIso()};
