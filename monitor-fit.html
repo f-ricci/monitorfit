@@ -5,20 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Monitor fit on your desk</title>
 <style>
-:root{--bg:#f7f6f3;--ink:#1d1d1b;--mute:#6b6a66;--line:#d8d6cf;--shelfline:#c9c6bd;--desk:#e4e1da;--bezel:#1f1f22;--card:#fff;--ok:#2e8b57;--warn:#c77700;--bad:#c0392b}
+:root{--bg:#f7f6f3;--ink:#1d1d1b;--mute:#6b6a66;--line:#d8d6cf;--shelfline:#c9c6bd;--desk:#e4e1da;--bezel:#1f1f22;--card:#fff}
 @media (prefers-color-scheme:dark){:root{--bg:#1b1b1a;--ink:#eceae4;--mute:#a19f98;--line:#3a3936;--shelfline:#4a4945;--desk:#3a3834;--bezel:#0c0c0d;--card:#262624}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif}
-main{max-width:1100px;margin:0 auto;padding:28px 20px 40px}
+main{max-width:1640px;margin:0 auto;padding:28px 20px 40px}
 .pill{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:5px 12px;cursor:pointer}
 .legend{display:flex;flex-wrap:wrap;gap:16px;font-size:13px;color:var(--mute);margin:0 0 10px}
 .legend span{display:flex;align-items:center;gap:6px}
 .lg{width:14px;height:14px;border-radius:3px;display:inline-block;border:1px solid var(--line)}
 .lg.a{background:#fff6c8}.lg.b{background:transparent}.lg.c{background:#2a2a2a}
 #iso polygon.q{cursor:crosshair}
-h2{font-size:20px;margin:34px 0 4px}
-h1{font-size:26px;margin:0 0 4px;letter-spacing:-.01em}
-.sub{color:var(--mute);margin:0 0 20px;max-width:760px}
 .bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
 .bar button{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:7px 14px;cursor:pointer;display:flex;align-items:center;gap:8px}
 .bar button .sw{width:10px;height:10px;border-radius:3px}
@@ -29,93 +26,112 @@ h1{font-size:26px;margin:0 0 4px;letter-spacing:-.01em}
 .seg button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
 input[type=range]{width:220px}
 select{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:6px 10px}
-.bar label.chip{font-size:13px;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:5px 12px;cursor:pointer;display:flex;align-items:center;gap:6px}
-.bar label.chip .sw{width:10px;height:10px;border-radius:3px}
-.bar label.chip:has(input:checked){border-color:var(--ink)}
 label.ck{display:flex;gap:6px;align-items:center;cursor:pointer}
 .stage{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px;overflow:hidden}
 svg{display:block;width:100%;height:auto}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:14px}
-.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
-.stat .k{color:var(--mute);font-size:12px;text-transform:uppercase;letter-spacing:.04em}
-.stat .v{font-size:20px;font-weight:600;margin-top:2px;font-variant-numeric:tabular-nums}
-.stat .n{font-size:13px;margin-top:2px}
-.ok{color:var(--ok)}.warn{color:var(--warn)}.bad{color:var(--bad)}
-.notes{color:var(--mute);font-size:13px;margin-top:18px;max-width:820px}
-.notes li{margin:3px 0}
+.duo{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:0}
+.stage.duo{padding:0}
+.duo>div{height:clamp(320px,64vh,760px);padding:10px}
+.duo svg{height:100%}
+.duo>.foot{grid-column:1/-1;height:auto;padding:0;display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line)}
+.foot>*{padding:10px 14px}
+.foot>.legend{margin:0;border-left:1px solid var(--line)}
+.key{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:var(--mute)}
+.key span{display:flex;align-items:center;gap:6px}
+.key i{width:16px;height:11px;border-radius:2px;display:inline-block}
+.duo>div:nth-child(2){border-left:1px solid var(--line)}
+@media (max-width:1100px){.duo{grid-template-columns:1fr}.duo>div:nth-child(2){border-left:0;border-top:1px solid var(--line)}.duo>div,.duo svg{height:auto}.duo>.foot{grid-template-columns:1fr}.foot>.legend{border-left:0;border-top:1px solid var(--line)}}
+.layout{display:grid;grid-template-columns:290px minmax(0,1fr);gap:24px;align-items:start}
+.side{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;position:sticky;top:16px;max-height:calc(100vh - 32px);overflow:auto}
+.sec{border-top:1px solid var(--line);margin-top:16px;padding-top:14px}
+.sec h3{font-size:15px;margin:0 0 10px}
+.fld{margin-bottom:12px}
+.fl{display:flex;justify-content:space-between;font-size:13px;color:var(--mute);margin-bottom:4px}
+.fl b{color:var(--ink);font-weight:600}
+.fl.sm{font-size:12px;margin-top:6px}
+.side input[type=range]{width:100%}
+.side label.ck{font-size:14px;margin-bottom:12px}
+.side .pill{margin-top:8px}
+.anchors{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.anchors button{font:inherit;font-size:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:6px;padding:6px 4px;cursor:pointer}
+.anchors button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.anchors [data-p=tr]{grid-column:3}
+.side .lbl{display:block;font-size:12px;color:var(--mute);text-transform:uppercase;letter-spacing:.04em;margin:0 0 6px}
+.side select{width:100%;margin-bottom:18px}
+.combo{position:relative;margin-bottom:12px}
+#comboBtn{width:100%;font:inherit;font-size:14px;display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 10px;cursor:pointer}
+.pop{position:absolute;z-index:5;left:0;right:0;top:calc(100% + 4px);background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);padding:6px}
+.pop input[type=search]{width:100%;font:inherit;font-size:14px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:6px;padding:6px 8px;margin-bottom:4px}
+#opts{max-height:280px;overflow:auto}
+#opts label{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;font-size:14px;cursor:pointer}
+#opts label:hover{background:var(--bg)}
+#opts .sep{border-top:1px solid var(--line);margin:4px 0}
+#opts .none{padding:6px 8px;font-size:13px;color:var(--mute)}
+.side #picks{flex-direction:column;gap:4px;margin:0}
+.side #picks button{border-radius:8px;justify-content:flex-start;text-align:left}
+@media (max-width:900px){.layout{grid-template-columns:1fr}.side{position:static;max-height:none;overflow:visible}}
 </style>
 </head>
 <body>
 <main>
-<h1>Which monitor fits between the shelf and the door frame?</h1>
-<p class="sub">Front view of your desk, to scale, measured from your photo using the ASUS ProArt 27" 4K (612 mm wide) as the ruler. Pick a monitor to see it in place; the dashed outline is your monitor.</p>
-
-<div class="row"><span>My monitor</span><select id="mine" aria-label="My monitor"></select></div>
-<div class="row"><span>Selected for comparison</span><div class="bar" id="cmp" style="margin:0"></div></div>
-<div class="bar" id="picks"></div>
-<div class="row">
-  <span>Anchor to my monitor</span>
-  <div class="seg" id="pos">
-    <button data-p="bc" aria-pressed="true">Bottom centre</button>
-    <button data-p="bl" aria-pressed="false">Bottom left</button>
-    <button data-p="tl" aria-pressed="false">Top left</button>
-    <button data-p="tr" aria-pressed="false">Top right</button>
-    <button data-p="br" aria-pressed="false">Bottom right</button>
+<div class="layout">
+<aside class="side">
+  <label class="lbl" for="mine">My monitor</label>
+  <select id="mine"></select>
+  <div class="lbl">Selected for comparison</div>
+  <div class="combo" id="combo">
+    <button type="button" id="comboBtn" aria-haspopup="listbox" aria-expanded="false"><span>Add or remove monitors</span><span aria-hidden="true">▾</span></button>
+    <div class="pop" id="pop" hidden>
+      <input type="search" id="q" placeholder="Search monitors" aria-label="Search monitors" autocomplete="off">
+      <div id="opts" role="listbox" aria-multiselectable="true"></div>
+    </div>
   </div>
-  <label class="ck"><input type="checkbox" id="ghost" checked> Show my monitor</label>
-</div>
+  <div class="bar" id="picks"></div>
 
-<div class="stage"><svg id="svg" role="img" aria-label="Front view of the selected monitor with its dimensions"></svg></div>
+  <section class="sec">
+    <h3>Front view</h3>
+    <div class="fld"><span class="fl">Anchor to my monitor</span>
+      <div class="anchors" id="pos">
+        <button data-p="tl" aria-pressed="false">Top left</button>
+        <button data-p="tr" aria-pressed="false">Top right</button>
+        <button data-p="bl" aria-pressed="false">Bottom left</button>
+        <button data-p="bc" aria-pressed="true">Bottom centre</button>
+        <button data-p="br" aria-pressed="false">Bottom right</button>
+      </div>
+    </div>
+    <label class="ck"><input type="checkbox" id="ghost" checked> Show my monitor</label>
+  </section>
 
-<div class="stats">
-  <div class="stat"><div class="k">Monitor body (no stand)</div><div class="v" id="sSize"></div><div class="n" id="sPanel"></div></div>
-  <div class="stat"><div class="k">Width vs yours</div><div class="v" id="sW"></div><div class="n" id="sWn"></div></div>
-  <div class="stat"><div class="k">Height vs yours</div><div class="v" id="sH"></div><div class="n" id="sHn"></div></div>
-  <div class="stat"><div class="k">Screen area vs yours</div><div class="v" id="sA"></div><div class="n" id="sAn"></div></div>
-</div>
+  <section class="sec">
+    <h3>Seen from your chair</h3>
+    <div class="fld"><span class="fl">Desk depth</span>
+      <div class="seg" id="depth">
+        <button data-d="600" aria-pressed="false">60 cm</button>
+        <button data-d="700" aria-pressed="true">70 cm</button>
+        <button data-d="800" aria-pressed="false">80 cm</button>
+      </div>
+    </div>
+    <div class="fld"><label class="fl" for="dw">Desk width <b id="dwv"></b></label><input type="range" id="dw" min="100" max="300" step="5" value="240"></div>
+    <div class="fld"><label class="fl" for="bk">Stand from back edge <b id="bkv"></b></label><input type="range" id="bk" min="0" max="30" step="1" value="0"></div>
+    <div class="fld"><label class="fl" for="eye">Eyes behind desk edge <b id="eyev"></b></label><input type="range" id="eye" min="100" max="500" step="10" value="250"></div>
+    <div class="fld"><label class="fl" for="yaw">View angle</label><input type="range" id="yaw" min="-55" max="55" step="1" value="28"></div>
+    <label class="ck"><input type="checkbox" id="ighost" checked> Show my monitor</label>
+    <div class="fld"><span class="fl">Where you look</span>
+      <label class="fl sm" for="gy">Left / right</label><input type="range" id="gy" min="-70" max="70" step="1" value="0">
+      <label class="fl sm" for="gp">Up / down</label><input type="range" id="gp" min="-45" max="25" step="1" value="0">
+      <button class="pill" id="gc">Back to centre</button>
+    </div>
+  </section>
+</aside>
+<div class="content">
 
-<h2>Seen from your chair</h2>
-<p class="sub">Axonometric view from behind the seat, same monitor and position as above. Lines run from your eyes to the screen's edges.</p>
-<div class="row">
-  <span>Desk depth</span>
-  <div class="seg" id="depth">
-    <button data-d="600" aria-pressed="false">60 cm</button>
-    <button data-d="700" aria-pressed="true">70 cm</button>
-    <button data-d="800" aria-pressed="false">80 cm</button>
-  </div>
-  <span>Desk width</span>
-  <input type="range" id="dw" min="100" max="300" step="5" value="240" aria-label="Desk width"><span id="dwv"></span>
-  <span>Stand from back edge</span>
-  <input type="range" id="bk" min="0" max="30" step="1" value="0" aria-label="Stand distance from the back edge"><span id="bkv"></span>
-  <span>Eyes behind desk edge</span>
-  <input type="range" id="eye" min="100" max="500" step="10" value="250" aria-label="Eye distance behind the desk edge"><span id="eyev"></span>
-  <span>Angle</span>
-  <input type="range" id="yaw" min="-55" max="55" step="1" value="28" aria-label="Rotate the view">
-  <label class="ck"><input type="checkbox" id="ighost" checked> Show my monitor</label>
+<div class="stage duo">
+  <div><svg id="svg" role="img" aria-label="Front view of the selected monitor with its dimensions"></svg></div>
+  <div><svg id="iso" role="img" aria-label="Axonometric view of the desk from the chair"></svg></div>
+  <div class="foot"><div class="key" id="key"></div><div class="legend"><span><i class="lg a"></i>Easy focus, within 15° of your gaze</span><span><i class="lg b"></i>Eye movement, 15–30°</span><span><i class="lg c"></i>Head turn, past 30°</span><span>Click or drag on the screen to look there.</span></div></div>
 </div>
-<div class="row">
-  <span>Where you look</span>
-  <span>left / right</span><input type="range" id="gy" min="-70" max="70" step="1" value="0" aria-label="Look left or right">
-  <span>up / down</span><input type="range" id="gp" min="-45" max="25" step="1" value="0" aria-label="Look up or down">
-  <button class="pill" id="gc">Back to centre</button>
 </div>
-<div class="legend"><span><i class="lg a"></i>Sharp, easy focus (within 15° of your gaze)</span><span><i class="lg b"></i>Seen by moving your eyes, no tint (15–30°)</span><span><i class="lg c"></i>Needs a head turn (past 30°)</span><span>Click or drag on the screen to look there.</span></div>
-<div class="stage"><svg id="iso" role="img" aria-label="Axonometric view of the desk from the chair"></svg></div>
-<div class="stats">
-  <div class="stat"><div class="k">Eye to screen centre</div><div class="v" id="iD"></div><div class="n" id="iDn"></div></div>
-  <div class="stat"><div class="k">Screen width you see</div><div class="v" id="iA"></div><div class="n" id="iAn"></div></div>
-  <div class="stat"><div class="k">Clear desk in front of screen</div><div class="v" id="iF"></div><div class="n" id="iFn"></div></div>
-  <div class="stat"><div class="k">Screen within eye reach</div><div class="v" id="iG"></div><div class="n" id="iGn"></div></div>
-  <div class="stat"><div class="k">Curve vs distance</div><div class="v" id="iC"></div><div class="n" id="iCn"></div></div>
 </div>
-
-<ul class="notes">
-  <li><b>From the photo</b> (scale 0.72 mm per pixel at the monitor): shelf edge 351 mm left of the monitor's centre, door-frame trim starts 331 mm right of it, the door itself at about 450 mm. The monitor's bottom edge sits about 9 cm above the desk. Expect ±2–3 cm, because the shelf front is closer to the camera than the screen.</li>
-  <li><b>Height:</b> every monitor is drawn with its bottom edge at your current 9 cm, so you can compare tops. Real stands differ.</li>
-  <li><b>Sizes</b> are manufacturer body dimensions without stand. Your 27" is taken as the PA279CRV (the PA279CV is 2.5 mm wider). ProArt 32" body height and the Dell 40"/LG 49"/Dell 52" panel sizes are worked out from diagonal and ratio. Curved screens are drawn at their spec width.</li>
-  <li>The door frame trim is shallow, so a monitor standing in front of it can overlap it. The shelf is a hard stop.</li>
-  <li><b>Chair view</b> assumes the stand's base starts at the distance you set from the desk's back edge, the screen face sits 60% of the stand's depth forward of that, eyes 45 cm above the desk top and a 30 cm deep shelf unit. Viewing-angle bands are a rule of thumb: up to about 45° is easy to take in, past 60° you turn your head.</li>
-</ul>
 </main>
 
 <script>
@@ -153,12 +169,12 @@ function assignColors(){
 // st.pos names the point of my monitor the compared one shares: b/t + l/c/r
 function left(m){var y=mine();return st.pos[1]==="l"?-y.bw/2:st.pos[1]==="c"?-m.bw/2:y.bw/2-m.bw}
 function base(m){var y=mine();return st.pos[0]==="b"?LIFT:LIFT+y.bh-m.bh}
-function dim(x1,x2,y,label,c){
+function dim(x1,x2,y,label,c,below){
   c=c||"var(--ink)";
   el("line",{x1:x1,y1:y,x2:x2,y2:y,stroke:c,"stroke-width":2});
   el("line",{x1:x1,y1:y-10,x2:x1,y2:y+10,stroke:c,"stroke-width":2});
   el("line",{x1:x2,y1:y-10,x2:x2,y2:y+10,stroke:c,"stroke-width":2});
-  tx((x1+x2)/2,y-10,label,{"text-anchor":"middle",fill:c,"font-weight":600});
+  tx((x1+x2)/2,below?y+32:y-10,label,{"text-anchor":"middle",fill:c,"font-weight":600});
 }
 function vdim(x,b,t,label,c,toLeft){
   c=c||"var(--ink)";
@@ -177,61 +193,71 @@ function monitor(m,x,b,ghost){
   var side=(m.bw-m.pw)/2;
   el("rect",{x:x+side,y:y+side,width:m.pw,height:m.ph,rx:2,fill:colorOf(m),"fill-opacity":.32,stroke:colorOf(m),"stroke-width":3},g);
 }
-// fixed frame that fits any pair of monitors in any anchor, so the scale never changes
-var W1=Math.max.apply(0,M.map(function(m){return m.bw})),W0=Math.min.apply(0,M.map(function(m){return m.bw}));
-var H1=Math.max.apply(0,M.map(function(m){return m.bh})),H0=Math.min.apply(0,M.map(function(m){return m.bh}));
-var XMAX=W1-W0/2+60;
-svg.setAttribute("viewBox",[-XMAX-260,-(LIFT+H1)-150,2*XMAX+520,LIFT+H1+150+(H1-H0)+20].join(" "));
+// crop the drawing to what was drawn, so it fills its half of the panel
+function fit(s,pad){var b=s.getBBox();s.setAttribute("viewBox",[b.x-pad,b.y-pad,b.width+2*pad,b.height+2*pad].map(Math.round).join(" "))}
 function draw(){
   svg.textContent="";
   var m=cur(), x=left(m), r=x+m.bw, b=base(m), top=b+m.bh;
   monitor(m,x,b,false);
   if(st.ghost && m.id!==st.mine) monitor(mine(),-mine().bw/2,LIFT,true);
   // dims
-  var y=mine(), yl=-y.bw/2, yt=LIFT+y.bh, hi=-Math.max(top,yt), L=Math.min(x,yl), R=Math.max(r,-yl), onLeft=st.pos[1]!=="r";
+  var y=mine(), yl=-y.bw/2, yt=LIFT+y.bh, hi=-Math.max(top,yt), L=Math.min(x,yl), R=Math.max(r,-yl);
+  // compared monitor on top and right; my monitor, in its own colour, on the bottom and left
   dim(x,r,hi-40,cm(m.bw)+" wide");
-  vdim(onLeft?R+30:L-30,b,top,cm(m.bh)+" tall",null,!onLeft);
-  // my monitor's sizes in its own colour: width one row higher, height on the anchored side
+  vdim(R+30,b,top,cm(m.bh)+" tall");
   if(st.ghost && m.id!==st.mine){
-    dim(yl,-yl,hi-95,cm(y.bw)+" wide (yours)",colorOf(y));
-    vdim(onLeft?L-30:R+30,LIFT,yt,cm(y.bh)+" tall (yours)",colorOf(y),onLeft);
+    dim(yl,-yl,Math.max(0,LIFT-b)+40,cm(y.bw)+" wide",colorOf(y),true);
+    vdim(L-30,LIFT,yt,cm(y.bh)+" tall",colorOf(y),true);
   }
-  stats(m);
+  fit(svg,30);
+  // legend: compared monitor solid (top and right sizes), mine dashed (bottom and left sizes)
+  var key=document.getElementById("key");key.textContent="";
+  function item(mon,dashed,where){var sp=document.createElement("span"),i=document.createElement("i");
+    i.style.cssText=dashed?"border:2px dashed "+colorOf(mon):"background:"+colorOf(mon);
+    sp.appendChild(i);sp.appendChild(document.createTextNode(mon.name+" · "+where));key.appendChild(sp)}
+  var both=st.ghost && m.id!==st.mine;
+  item(m,false,(m.id===st.mine?"your monitor, ":"")+"sizes top and right");
+  if(both)item(y,true,"your monitor, sizes bottom and left");
 }
-function set(id,v,cls,n,nid){var e=document.getElementById(id);e.textContent=v;e.className="v "+(cls||"");document.getElementById(nid).textContent=n}
-function diff(mm){return mm===0?"Same":(mm>0?"+":"−")+cm(Math.abs(mm))}
-function stats(m){
-  var y=mine();
-  set("sSize",cm(m.bw)+" × "+cm(m.bh),"",(m.res+" · "+(m.curve==="flat"?"flat":"curved "+m.curve)+(m.est?" · height estimated":"")),"sPanel");
-  set("sW",diff(m.bw-y.bw),"",m.bw>y.bw?"Wider than yours":m.bw<y.bw?"Narrower than yours":"Same width as yours","sWn");
-  set("sH",diff(m.bh-y.bh),"",m.bh>y.bh?"Taller than yours":m.bh<y.bh?"Shorter than yours":"Same height as yours","sHn");
-  var ar=m.pw*m.ph/(y.pw*y.ph);
-  set("sA",ar===1?"Same":Math.round(ar*100)+"%","",ar>1?"More screen than yours":ar<1?"Less screen than yours":"Same panel as yours","sAn");
-}
-var picks=document.getElementById("picks"), mineSel=document.getElementById("mine"), cmp=document.getElementById("cmp");
+var picks=document.getElementById("picks"), mineSel=document.getElementById("mine");
+var combo=document.getElementById("combo"), comboBtn=document.getElementById("comboBtn"), pop=document.getElementById("pop"), q=document.getElementById("q"), opts=document.getElementById("opts"), optOrder=[];
 function sw(m){var s=document.createElement("span");s.className="sw";s.style.background=colorOf(m);return s}
-// my monitor first, then the ones selected for comparison
+// the monitors selected for comparison; my monitor is never one of them
 function renderPicks(){
   assignColors();
-  var shown=M.filter(function(m){return m.id===st.mine||st.compare.indexOf(m.id)>=0});
-  shown.sort(function(a,b){return (b.id===st.mine)-(a.id===st.mine)});
-  if(!shown.some(function(m){return m.id===st.m}))st.m=st.mine;
+  var shown=M.filter(function(m){return m.id!==st.mine&&st.compare.indexOf(m.id)>=0});
+  if(!shown.some(function(m){return m.id===st.m}))st.m=shown.length?shown[0].id:st.mine;
   picks.textContent="";
   shown.forEach(function(m){
     var b=document.createElement("button");b.setAttribute("aria-pressed",m.id===st.m);
-    b.appendChild(sw(m));b.appendChild(document.createTextNode(m.name+(m.id===st.mine?" (yours)":"")));
+    b.appendChild(sw(m));b.appendChild(document.createTextNode(m.name));
     b.onclick=function(){st.m=m.id;renderPicks();draw()};
     picks.appendChild(b);
   });
-  cmp.textContent="";
-  M.forEach(function(m){
-    if(m.id===st.mine)return;
-    var l=document.createElement("label");l.className="chip";
-    var c=document.createElement("input");c.type="checkbox";c.checked=st.compare.indexOf(m.id)>=0;
-    c.onchange=function(){st.compare=c.checked?st.compare.concat(m.id):st.compare.filter(function(id){return id!==m.id});renderPicks();draw()};
-    l.appendChild(c);l.appendChild(sw(m));l.appendChild(document.createTextNode(m.name));cmp.appendChild(l);
-  });
 }
+// comparison dropdown: selected ones sit on top, checked; the order is fixed when it opens so rows don't jump while toggling
+function renderOpts(){
+  var term=q.value.trim().toLowerCase();opts.textContent="";
+  var rows=optOrder.filter(function(m){return m.id!==st.mine&&m.name.toLowerCase().indexOf(term)>=0}),sep=false;
+  rows.forEach(function(m,i){
+    if(i&&!sep&&!m.wasOn&&rows[i-1].wasOn){var d=document.createElement("div");d.className="sep";opts.appendChild(d);sep=true}
+    var l=document.createElement("label"),c=document.createElement("input");l.setAttribute("role","option");
+    c.type="checkbox";c.checked=st.compare.indexOf(m.id)>=0;l.setAttribute("aria-selected",c.checked);
+    c.onchange=function(){st.compare=c.checked?st.compare.concat(m.id):st.compare.filter(function(id){return id!==m.id});l.setAttribute("aria-selected",c.checked);renderPicks();draw()};
+    l.appendChild(c);l.appendChild(document.createTextNode(m.name));opts.appendChild(l);
+  });
+  if(!rows.length){var n=document.createElement("div");n.className="none";n.textContent="No monitors match";opts.appendChild(n)}
+}
+function openCombo(){
+  optOrder=M.map(function(m){return {id:m.id,name:m.name,wasOn:st.compare.indexOf(m.id)>=0}});
+  optOrder.sort(function(a,b){return b.wasOn-a.wasOn});
+  q.value="";pop.hidden=false;comboBtn.setAttribute("aria-expanded","true");renderOpts();q.focus();
+}
+function closeCombo(){pop.hidden=true;comboBtn.setAttribute("aria-expanded","false")}
+comboBtn.onclick=function(){pop.hidden?openCombo():closeCombo()};
+q.oninput=renderOpts;
+document.addEventListener("mousedown",function(e){if(!pop.hidden&&!combo.contains(e.target))closeCombo()});
+combo.addEventListener("keydown",function(e){if(e.key==="Escape"&&!pop.hidden){closeCombo();comboBtn.focus()}});
 M.forEach(function(m){var o=document.createElement("option");o.value=m.id;o.textContent=m.name;mineSel.appendChild(o)});
 mineSel.value=st.mine;
 mineSel.onchange=function(){st.mine=mineSel.value;renderPicks();draw()};
@@ -252,23 +278,19 @@ function box(x0,x1,y0,y1,h0,h1,fill,stroke){
   poly([[x0,y0,h1],[x1,y0,h1],[x1,y1,h1],[x0,y1,h1]],{fill:fill,stroke:s,"stroke-width":2});
 }
 function line3(a,b,at){var p=P(a[0],a[1],a[2]),q=P(b[0],b[1],b[2]);E("line",Object.assign({x1:p[0],y1:p[1],x2:q[0],y2:q[1]},at))}
-function screenFace(m){var x=left(m),cx=x+m.bw/2,pz=ist.back+m.sd*0.6,R=m.R,N=24,pts=[];
+// the chair view ignores the front-view anchor: every monitor stands centred on the desk
+function screenFace(m){var x=-m.bw/2,cx=x+m.bw/2,pz=ist.back+m.sd*0.6,R=m.R,N=24,pts=[];
   for(var i=0;i<=N;i++){var u=-m.bw/2+m.bw*i/N,b=R?R-Math.sqrt(R*R-u*u):0,b0=R?R-Math.sqrt(R*R-m.bw*m.bw/4):0;pts.push([cx+u,pz+b-b0/2])}
   return {pts:pts,cx:cx,pz:pz};}
 function drawIso(){
   IS.textContent="";var m=cur(),D=ist.D,eyeY=D+ist.eye;
-  // frame: desk top, tallest monitor, chair at the deepest desk and furthest eyes
-  var XR=ist.W/2,XL=-XR,XE=Math.max(XR,XMAX)+50;
-  var ext=[];[-XE,XE].forEach(function(x){ext.push(P(x,0,0),P(x,1650,0),P(x,1650,-330))});
-  [-XMAX,XMAX].forEach(function(x){ext.push(P(x,0,LIFT+H1+60))});
-  var xs=ext.map(function(p){return p[0]}),ys=ext.map(function(p){return p[1]}),x0=Math.min.apply(0,xs)-60,y0=Math.min.apply(0,ys)-40;
-  IS.setAttribute("viewBox",[x0,y0,Math.max.apply(0,xs)+60-x0,Math.max.apply(0,ys)+40-y0].map(Math.round).join(" "));
+  var XR=ist.W/2,XL=-XR;
   // desk top
   box(XL,XR,0,D,-25,0,"var(--desk)");
-  var f=screenFace(m),cx=f.cx,lowH=base(m),topH=base(m)+m.bh,side=(m.bw-m.pw)/2;
+  var f=screenFace(m),cx=f.cx,lowH=LIFT,topH=LIFT+m.bh,side=(m.bw-m.pw)/2;
   // stand
   box(cx-130,cx+130,ist.back,ist.back+m.sd,0,10,"#9a9a9e","#7d7d82");
-  box(cx-30,cx+30,f.pz-55,f.pz-25,10,base(m)+m.bh*0.55,"#a7a7ab","#7d7d82");
+  box(cx-30,cx+30,f.pz-55,f.pz-25,10,LIFT+m.bh*0.55,"#a7a7ab","#7d7d82");
   // back + face
   var back=f.pts.map(function(p){return [p[0],p[1]-35]});
   poly(back.map(function(p){return [p[0],p[1],lowH]}).concat(back.slice().reverse().map(function(p){return [p[0],p[1],topH]})),{fill:"#3a3b3f",stroke:"#2a2a2d"});
@@ -292,11 +314,11 @@ function drawIso(){
   if(ist.gy===null){var c0=angs(cx,sy(cx),(hb+ht)/2);ist.gy=Math.round(c0[0]);ist.gp=Math.round(c0[1])}
   document.getElementById("gy").value=ist.gy;document.getElementById("gp").value=ist.gp;
   var gr=ist.gy*Math.PI/180,gpr=ist.gp*Math.PI/180,G=[Math.sin(gr)*Math.cos(gpr),Math.cos(gr)*Math.cos(gpr),Math.sin(gpr)];
-  var NC=36,NR=12,inReach=0,best=null,bestA=1e9;
+  var NC=36,NR=12,best=null,bestA=1e9;
   for(var i=0;i<NC;i++)for(var j=0;j<NR;j++){
     var xa=cx-m.pw/2+m.pw*i/NC,xb=cx-m.pw/2+m.pw*(i+1)/NC,ha=hb+m.ph*j/NR,hb2=hb+m.ph*(j+1)/NR,xm=(xa+xb)/2,hm=(ha+hb2)/2,d=dir(xm,sy(xm),hm);
     var a=Math.acos(Math.max(-1,Math.min(1,d[0]*G[0]+d[1]*G[1]+d[2]*G[2])))*180/Math.PI;
-    if(a<=30)inReach++; if(a<bestA){bestA=a;best=[xm,sy(xm),hm]}
+    if(a<bestA){bestA=a;best=[xm,sy(xm),hm]}
     var fill=a<=15?"#fff6c8":a<=30?"#000":"#000",op=a<=15?.55:a<=30?0.0:.6;
     var q=E("polygon",{"class":"q",points:[[xa,sy(xa),ha],[xb,sy(xb),ha],[xb,sy(xb),hb2],[xa,sy(xa),hb2]].map(function(p){var r=P(p[0],p[1],p[2]);return r[0].toFixed(1)+","+r[1].toFixed(1)}).join(" "),fill:fill,"fill-opacity":op,stroke:fill,"stroke-opacity":op,"stroke-width":1.2});
     (function(x,y,h){q.addEventListener("pointerdown",function(e){e.preventDefault();ist.drag=true;look(x,y,h)});q.addEventListener("pointerenter",function(){if(ist.drag)look(x,y,h)})})(xm,sy(xm),hm);
@@ -317,22 +339,11 @@ function drawIso(){
   if(gaze){line3(eye,gaze,{stroke:"#e0a800","stroke-width":3});var gp2=P(gaze[0],gaze[1],gaze[2]);E("circle",{cx:gp2[0],cy:gp2[1],r:12,fill:"#e0a800",stroke:"#000","stroke-width":2})}
   line3(eye,[0,eyeY,-250],{stroke:"var(--ink)","stroke-width":2,"stroke-dasharray":"3 7",opacity:.6});var ep=P(eye[0],eye[1],eye[2]);E("circle",{cx:ep[0],cy:ep[1],r:14,fill:"var(--ink)"});
   var t=E("text",{x:ep[0]-24,y:ep[1]+10,"text-anchor":"end","font-size":30,fill:"var(--ink)","font-weight":600});t.textContent="your eyes, 45 cm above the desk";
-  // stats
-  var dist=Math.sqrt(Math.pow(mid[0],2)+Math.pow(eyeY-mid[1],2)+Math.pow(EYEH-cH,2));
-  var aL=Math.atan2(-L[0],eyeY-L[1]),aR=Math.atan2(Rr[0],eyeY-Rr[1]),ang=(aL+aR)*180/Math.PI;
-  iset("iD",cm(dist),"","Desk "+(D/10)+" cm, eyes "+(ist.eye/10)+" cm back from the edge","iDn");
-  var pc=Math.round(inReach/(NC*NR)*100);
-  iset("iG",pc+"%",pc>=90?"ok":pc>=60?"warn":"bad",pc>=100?"All of it, from where you're looking":"Of the screen without turning your head","iGn");
-  iset("iA",Math.round(ang)+"°",ang<=45?"ok":ang<=60?"warn":"bad",ang<=45?"Easy to take in":ang<=60?"Some eye movement":"You'll turn your head","iAn");
-  var front=D-(f.pz+ (m.R?0:0));
-  iset("iF",cm(D-f.pz-((f.pts[0][1]-f.pz)>0?(f.pts[0][1]-f.pz):0)),"","From the screen's nearest point to the desk edge","iFn");
-  if(m.R){var r=m.R;iset("iC",(r/10)+" cm radius",Math.abs(r-dist)<r*0.4?"ok":"warn",dist<r?"You sit "+cm(r-dist)+" inside the curve's centre":"You sit "+cm(dist-r)+" beyond the curve's centre","iCn")}
-  else iset("iC","Flat","","No curve to match","iCn");
   document.getElementById("eyev").textContent=(ist.eye/10)+" cm";
   document.getElementById("dwv").textContent=(ist.W/10)+" cm";
   document.getElementById("bkv").textContent=(ist.back/10)+" cm";
+  fit(IS,40);
 }
-function iset(id,v,cls,n,nid){var e=document.getElementById(id);e.textContent=v;e.className="v "+(cls||"");document.getElementById(nid).textContent=n}
 var depth=document.getElementById("depth");
 [].forEach.call(depth.children,function(b){b.onclick=function(){ist.D=+b.dataset.d;[].forEach.call(depth.children,function(c){c.setAttribute("aria-pressed",c===b)});drawIso()}});
 document.getElementById("bk").oninput=function(e){ist.back=+e.target.value*10;drawIso()};
