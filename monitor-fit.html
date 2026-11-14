@@ -58,7 +58,7 @@ svg{display:block;width:100%;height:auto}
   <label class="ck"><input type="checkbox" id="ghost" checked> Show current 27"</label>
 </div>
 
-<div class="stage"><svg id="svg" viewBox="-820 -840 1820 920" role="img" aria-label="Front view of the desk with the selected monitor"></svg></div>
+<div class="stage"><svg id="svg" viewBox="-820 -700 1820 710" role="img" aria-label="Front view of the selected monitor with its dimensions"></svg></div>
 
 <div class="stats">
   <div class="stat"><div class="k">Monitor body (no stand)</div><div class="v" id="sSize"></div><div class="n" id="sPanel"></div></div>
@@ -144,42 +144,19 @@ function monitor(m,x,ghost){
   el("rect",{x:x,y:y,width:m.bw,height:m.bh,rx:6,fill:"var(--bezel)"},g);
   var side=(m.bw-m.pw)/2;
   el("rect",{x:x+side,y:y+side,width:m.pw,height:m.ph,rx:2,fill:m.c,"fill-opacity":.32,stroke:m.c,"stroke-width":3},g);
-  el("rect",{x:cx-50,y:y-36,width:100,height:36,rx:8,fill:"#55565a"},g);
-  el("circle",{cx:cx,cy:y-18,r:7,fill:"#222"},g);
 }
 function draw(){
   svg.textContent="";
   var m=cur(), x=left(m), r=x+m.bw, top=LIFT+m.bh;
-  el("rect",{x:-820,y:-840,width:1820,height:840,fill:"var(--wall)"});
-  // door frame + door
-  el("rect",{x:TRIM,y:-840,width:DOOR-TRIM,height:840,fill:"var(--door)",stroke:"var(--shelfline)","stroke-width":2});
-  el("line",{x1:TRIM+40,y1:-840,x2:TRIM+40,y2:0,stroke:"var(--shelfline)","stroke-width":2});
-  el("rect",{x:DOOR,y:-840,width:560,height:840,fill:"var(--door)",stroke:"var(--shelfline)","stroke-width":2});
-  el("rect",{x:DOOR+70,y:-780,width:360,height:330,fill:"none",stroke:"var(--shelfline)","stroke-width":2});
-  el("rect",{x:DOOR+70,y:-400,width:360,height:330,fill:"none",stroke:"var(--shelfline)","stroke-width":2});
-  tx(TRIM+8,-805,"door frame",{"font-size":18});
-  tx(DOOR+80,-805,"door",{"font-size":18});
-  // shelf unit
-  el("rect",{x:-820,y:-840,width:820+SHELF,height:840,fill:"var(--shelf)",stroke:"var(--shelfline)","stroke-width":2});
-  el("rect",{x:SHELF-22,y:-840,width:22,height:840,fill:"var(--shelfline)",opacity:.5});
-  [-560,-300].forEach(function(yy){el("rect",{x:-820,y:yy,width:820+SHELF-22,height:20,fill:"var(--shelfline)",opacity:.6})});
-  tx(-800,-805,"shelf unit",{"font-size":18});
-  // desk
-  el("rect",{x:-820,y:0,width:1820,height:80,fill:"var(--desk)"});
-  el("line",{x1:-820,y1:0,x2:1000,y2:0,stroke:"var(--shelfline)","stroke-width":2});
-  tx(-800,50,"desk",{"font-size":18});
-  // clash zones
   monitor(m,x,false);
   if(st.ghost && m.id!=="pa27") monitor(CUR,-CUR.bw/2,true);
-  if(x<SHELF) el("rect",{x:x,y:-top,width:SHELF-x,height:m.bh,fill:"none",stroke:"var(--bad)","stroke-width":3});
   // dims
-  dim(x,r,-top-60,cm(m.bw)+" wide");
-  el("line",{x1:SHELF,y1:-200,x2:SHELF,y2:-120,stroke:"var(--ink)","stroke-width":1.5,"stroke-dasharray":"4 4"});
-  el("line",{x1:TRIM,y1:-200,x2:TRIM,y2:-120,stroke:"var(--ink)","stroke-width":1.5,"stroke-dasharray":"4 4"});
-  var hx=Math.max(r,TRIM)+30; if(hx>930)hx=x-30;
-  el("line",{x1:hx,y1:0,x2:hx,y2:-top,stroke:"var(--ink)","stroke-width":2});
+  dim(x,r,-top-40,cm(m.bw)+" wide");
+  var hx=r+30; if(hx>850)hx=x-30;
+  el("line",{x1:hx,y1:-LIFT,x2:hx,y2:-top,stroke:"var(--ink)","stroke-width":2});
   el("line",{x1:hx-10,y1:-top,x2:hx+10,y2:-top,stroke:"var(--ink)","stroke-width":2});
-  tx(hx+(hx<x?-12:12),-top/2,cm(top),{fill:"var(--ink)","font-weight":600,"text-anchor":hx<x?"end":"start"});
+  el("line",{x1:hx-10,y1:-LIFT,x2:hx+10,y2:-LIFT,stroke:"var(--ink)","stroke-width":2});
+  tx(hx+(hx<x?-12:12),-LIFT-m.bh/2,cm(m.bh)+" tall",{fill:"var(--ink)","font-weight":600,"text-anchor":hx<x?"end":"start"});
   stats(m,x,r,top);
 }
 function set(id,v,cls,n,nid){var e=document.getElementById(id);e.textContent=v;e.className="v "+(cls||"");document.getElementById(nid).textContent=n}
