@@ -15,7 +15,7 @@ main{margin:0;padding:0}
 .legend span{display:flex;align-items:center;gap:6px}
 .lg{width:14px;height:14px;border-radius:3px;display:inline-block;border:1px solid var(--line)}
 .lg.a{background:#fff6c8}.lg.b{background:transparent}.lg.c{background:#2a2a2a}
-#iso polygon.q{cursor:crosshair}
+svg.iso polygon.q{cursor:crosshair}
 .bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
 .bar button{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:7px 14px;cursor:pointer;display:flex;align-items:center;gap:8px}
 .bar button .sw{width:10px;height:10px;border-radius:3px}
@@ -31,6 +31,9 @@ label.ck{display:flex;gap:6px;align-items:center;cursor:pointer}
 svg{display:block;width:100%;height:auto}
 .duo{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:0}
 .stage.duo{padding:0}
+.stage.duo+.stage.duo{margin-top:20px}
+#panels.multi .duo>div:not(.foot){height:auto;padding:0 10px}
+#panels.multi .duo svg{height:auto}
 .duo>div{height:clamp(320px,64vh,760px);padding:10px}
 .duo svg{height:100%}
 .duo>.foot{grid-column:1/-1;height:auto;padding:0;display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line)}
@@ -126,11 +129,14 @@ svg{display:block;width:100%;height:auto}
 </aside>
 <div class="content">
 
+<div id="panels"></div>
+<template id="panelTpl">
 <div class="stage duo">
-  <div><svg id="svg" role="img" aria-label="Front view of the selected monitor with its dimensions"></svg></div>
-  <div><svg id="iso" role="img" aria-label="Axonometric view of the desk from the chair"></svg></div>
-  <div class="foot"><div class="key" id="key"></div><div class="legend"><span><i class="lg a"></i>Easy focus, within 15° of your gaze</span><span><i class="lg b"></i>Eye movement, 15–30°</span><span><i class="lg c"></i>Head turn, past 30°</span><span>Click or drag on the screen to look there.</span></div></div>
+  <div><svg class="front" role="img"></svg></div>
+  <div><svg class="iso" role="img"></svg></div>
+  <div class="foot"><div class="key"></div><div class="legend"><span><i class="lg a"></i>Easy focus, within 15° of your gaze</span><span><i class="lg b"></i>Eye movement, 15–30°</span><span><i class="lg c"></i>Head turn, past 30°</span><span>Click or drag on the screen to look there.</span></div></div>
 </div>
+</template>
 </div>
 </div>
 </main>
@@ -148,13 +154,12 @@ var M=[
 var LIFT=92;
 // my monitor keeps one colour; compared monitors draw from a palette of 30 distinct colours (Glasbey)
 var MINE_COLOR="#C2459B", PALETTE=["#d60000","#8c3bff","#018700","#00acc6","#97ff00","#ff7ed1","#6b004f","#ffa52f","#573b00","#005659","#0000dd","#00fdcf","#a17569","#bcb6ff","#95b577","#002e6b","#645474","#790000","#0774d8","#fdf490","#004b00","#8e7900","#ff7266","#edb8b8","#5d7e66","#9ae4ff","#eb0077","#a57bb8","#5900a3","#03c600"];
-var st={m:"pa27",colors:{},mine:"pa27",compare:M.map(function(m){return m.id}),pos:"bc",ghost:true};
-var NS="http://www.w3.org/2000/svg", svg=document.getElementById("svg");
+var st={show:["pa32"],colors:{},mine:"pa27",compare:M.map(function(m){return m.id}),pos:"bc",ghost:true};
+var NS="http://www.w3.org/2000/svg", svg=null, panels=[];
 function el(t,a,p){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);(p||svg).appendChild(e);return e}
 function tx(x,y,s,a){var e=el("text",Object.assign({x:x,y:y,"font-size":22,fill:"var(--mute)","font-family":"inherit"},a||{}));e.textContent=s;return e}
 function cm(mm){return (Math.round(mm/10*10)/10).toFixed(1).replace(/\.0$/,"")+" cm"}
 function byId(id){return M.filter(function(m){return m.id===id})[0]}
-function cur(){return byId(st.m)}
 function mine(){return byId(st.mine)}
 function colorOf(m){return m.id===st.mine?MINE_COLOR:st.colors[m.id]||"var(--line)"}
 // give each compared monitor a random palette colour no other compared monitor has
@@ -196,9 +201,9 @@ function monitor(m,x,b,ghost){
 }
 // crop the drawing to what was drawn, so it fills its half of the panel
 function fit(s,pad){var b=s.getBBox();s.setAttribute("viewBox",[b.x-pad,b.y-pad,b.width+2*pad,b.height+2*pad].map(Math.round).join(" "))}
-function draw(){
+function drawFront(m,key){
   svg.textContent="";
-  var m=cur(), x=left(m), r=x+m.bw, b=base(m), top=b+m.bh;
+  var x=left(m), r=x+m.bw, b=base(m), top=b+m.bh;
   monitor(m,x,b,false);
   if(st.ghost && m.id!==st.mine) monitor(mine(),-mine().bw/2,LIFT,true);
   // dims
@@ -212,7 +217,7 @@ function draw(){
   }
   fit(svg,30);
   // legend: compared monitor solid (top and right sizes), mine dashed (bottom and left sizes)
-  var key=document.getElementById("key");key.textContent="";
+  key.textContent="";
   function item(mon,dashed,where){var sp=document.createElement("span"),i=document.createElement("i");
     i.style.cssText=dashed?"border:2px dashed "+colorOf(mon):"background:"+colorOf(mon);
     sp.appendChild(i);sp.appendChild(document.createTextNode(mon.name+" · "+where));key.appendChild(sp)}
@@ -223,17 +228,32 @@ function draw(){
 var picks=document.getElementById("picks"), mineSel=document.getElementById("mine");
 var combo=document.getElementById("combo"), comboBtn=document.getElementById("comboBtn"), pop=document.getElementById("pop"), q=document.getElementById("q"), opts=document.getElementById("opts"), optOrder=[];
 function sw(m){var s=document.createElement("span");s.className="sw";s.style.background=colorOf(m);return s}
-// the monitors selected for comparison; my monitor is never one of them
+// the monitors selected for comparison; my monitor is never one of them. Each one toggles its own panel
 function renderPicks(){
   assignColors();
-  var shown=M.filter(function(m){return m.id!==st.mine&&st.compare.indexOf(m.id)>=0});
-  if(!shown.some(function(m){return m.id===st.m}))st.m=shown.length?shown[0].id:st.mine;
+  var listed=M.filter(function(m){return m.id!==st.mine&&st.compare.indexOf(m.id)>=0});
+  st.show=st.show.filter(function(id){return listed.some(function(m){return m.id===id})});
   picks.textContent="";
-  shown.forEach(function(m){
-    var b=document.createElement("button");b.setAttribute("aria-pressed",m.id===st.m);
+  listed.forEach(function(m){
+    var b=document.createElement("button");b.setAttribute("aria-pressed",st.show.indexOf(m.id)>=0);
     b.appendChild(sw(m));b.appendChild(document.createTextNode(m.name));
-    b.onclick=function(){st.m=m.id;renderPicks();draw()};
+    b.onclick=function(){st.show=st.show.indexOf(m.id)>=0?st.show.filter(function(id){return id!==m.id}):st.show.concat(m.id);renderPicks();draw()};
     picks.appendChild(b);
+  });
+  renderPanels();
+}
+// one full panel per toggled monitor, in list order; just my monitor when none are toggled
+function renderPanels(){
+  var box=document.getElementById("panels"),tpl=document.getElementById("panelTpl");box.textContent="";
+  var ms=M.filter(function(m){return st.show.indexOf(m.id)>=0});if(!ms.length)ms=[mine()];
+  // several panels: halves shrink to their drawings so the stack stays compact
+  box.classList.toggle("multi",ms.length>1);
+  panels=ms.map(function(m){
+    var n=tpl.content.firstElementChild.cloneNode(true);box.appendChild(n);
+    var f=n.querySelector(".front"),i=n.querySelector(".iso");
+    f.setAttribute("aria-label","Front view of "+m.name+" with its dimensions");
+    i.setAttribute("aria-label","Axonometric view of the desk with "+m.name+", from the chair");
+    return {m:m,front:f,iso:i,key:n.querySelector(".key")};
   });
 }
 // comparison dropdown: selected ones sit on top, checked; the order is fixed when it opens so rows don't jump while toggling
@@ -263,11 +283,12 @@ M.forEach(function(m){var o=document.createElement("option");o.value=m.id;o.text
 mineSel.value=st.mine;
 mineSel.onchange=function(){st.mine=mineSel.value;renderPicks();draw()};
 renderPicks();
+function draw(){panels.forEach(function(pn){svg=pn.front;drawFront(pn.m,pn.key);drawIso(pn)})}
 var pos=document.getElementById("pos");
 [].forEach.call(pos.children,function(b){b.onclick=function(){st.pos=b.dataset.p;[].forEach.call(pos.children,function(c){c.setAttribute("aria-pressed",c===b)});draw()}});
 document.getElementById("ghost").onchange=function(e){st.ghost=e.target.checked;draw()};
 
-var IS=document.getElementById("iso"), ist={D:700,W:2400,back:0,eye:250,yaw:28,ghost:true,gy:null,gp:null,drag:false,lastM:null}, PITCH=32*Math.PI/180, EYEH=450;
+var IS=null, ist={D:700,W:2400,back:0,eye:250,yaw:28,ghost:true,gaze:{},drag:false}, PITCH=32*Math.PI/180, EYEH=450;
 function E(t,a){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);IS.appendChild(e);return e}
 function P(x,y,h){var a=ist.yaw*Math.PI/180,sx=x*Math.cos(a)-y*Math.sin(a),dz=x*Math.sin(a)+y*Math.cos(a);return [sx,-h*Math.cos(PITCH)+dz*Math.sin(PITCH)]}
 function poly(pts,a){E("polygon",Object.assign({points:pts.map(function(p){var q=P(p[0],p[1],p[2]);return q[0].toFixed(1)+","+q[1].toFixed(1)}).join(" ")},a))}
@@ -283,8 +304,8 @@ function line3(a,b,at){var p=P(a[0],a[1],a[2]),q=P(b[0],b[1],b[2]);E("line",Obje
 function screenFace(m){var x=-m.bw/2,cx=x+m.bw/2,pz=ist.back+m.sd*0.6,R=m.R,N=24,pts=[];
   for(var i=0;i<=N;i++){var u=-m.bw/2+m.bw*i/N,b=R?R-Math.sqrt(R*R-u*u):0,b0=R?R-Math.sqrt(R*R-m.bw*m.bw/4):0;pts.push([cx+u,pz+b-b0/2])}
   return {pts:pts,cx:cx,pz:pz};}
-function drawIso(){
-  IS.textContent="";var m=cur(),D=ist.D,eyeY=D+ist.eye;
+function drawIso(pn){
+  IS=pn.iso;IS.textContent="";var m=pn.m,D=ist.D,eyeY=D+ist.eye;
   var XR=ist.W/2,XL=-XR;
   // desk top
   box(XL,XR,0,D,-25,0,"var(--desk)");
@@ -306,15 +327,14 @@ function drawIso(){
     poly([[-130,ist.back,0],[130,ist.back,0],[130,ist.back+g.sd,0],[-130,ist.back+g.sd,0]],gs);
     line3([0,gz-40,0],[0,gz-40,gh0],gs);}
   // gaze zones over the panel
-  if(ist.lastM!==m.id){ist.gy=null;ist.gp=null;ist.lastM=m.id}
   var ex=0,ey=eyeY,eh=EYEH,hb=topH-side-m.ph,ht=topH-side;
   var b0=m.R?m.R-Math.sqrt(m.R*m.R-m.bw*m.bw/4):0;
   function sy(x){var u=x-cx;return f.pz+(m.R?m.R-Math.sqrt(m.R*m.R-u*u):0)-b0/2+2}
   function dir(x,y,h){var dx=x-ex,dy=ey-y,dh=h-eh,n=Math.sqrt(dx*dx+dy*dy+dh*dh);return [dx/n,dy/n,dh/n]}
   function angs(x,y,h){var d=dir(x,y,h);return [Math.atan2(d[0],d[1])*180/Math.PI,Math.asin(d[2])*180/Math.PI]}
-  if(ist.gy===null){var c0=angs(cx,sy(cx),(hb+ht)/2);ist.gy=Math.round(c0[0]);ist.gp=Math.round(c0[1])}
-  document.getElementById("gy").value=ist.gy;document.getElementById("gp").value=ist.gp;
-  var gr=ist.gy*Math.PI/180,gpr=ist.gp*Math.PI/180,G=[Math.sin(gr)*Math.cos(gpr),Math.cos(gr)*Math.cos(gpr),Math.sin(gpr)];
+  var gz=ist.gaze[m.id];
+  if(!gz){var c0=angs(cx,sy(cx),(hb+ht)/2);gz=ist.gaze[m.id]={gy:Math.round(c0[0]),gp:Math.round(c0[1])}}
+  var gr=gz.gy*Math.PI/180,gpr=gz.gp*Math.PI/180,G=[Math.sin(gr)*Math.cos(gpr),Math.cos(gr)*Math.cos(gpr),Math.sin(gpr)];
   var NC=36,NR=12,best=null,bestA=1e9;
   for(var i=0;i<NC;i++)for(var j=0;j<NR;j++){
     var xa=cx-m.pw/2+m.pw*i/NC,xb=cx-m.pw/2+m.pw*(i+1)/NC,ha=hb+m.ph*j/NR,hb2=hb+m.ph*(j+1)/NR,xm=(xa+xb)/2,hm=(ha+hb2)/2,d=dir(xm,sy(xm),hm);
@@ -324,7 +344,7 @@ function drawIso(){
     var q=E("polygon",{"class":"q",points:[[xa,sy(xa),ha],[xb,sy(xb),ha],[xb,sy(xb),hb2],[xa,sy(xa),hb2]].map(function(p){var r=P(p[0],p[1],p[2]);return r[0].toFixed(1)+","+r[1].toFixed(1)}).join(" "),fill:fill,"fill-opacity":op,stroke:fill,"stroke-opacity":op,"stroke-width":1.2});
     (function(x,y,h){q.addEventListener("pointerdown",function(e){e.preventDefault();ist.drag=true;look(x,y,h)});q.addEventListener("pointerenter",function(){if(ist.drag)look(x,y,h)})})(xm,sy(xm),hm);
   }
-  function look(x,y,h){var a=angs(x,y,h);ist.gy=Math.round(a[0]);ist.gp=Math.round(a[1]);drawIso()}
+  function look(x,y,h){var a=angs(x,y,h);ist.gaze[m.id]={gy:Math.round(a[0]),gp:Math.round(a[1])};document.getElementById("gy").value=ist.gaze[m.id].gy;document.getElementById("gp").value=ist.gaze[m.id].gp;drawIso(pn)}
   var gaze=bestA<8?best:null;
   // keyboard + mouse, centred on the desk
   box(-180,180,D-230,D-100,0,22,"#2b2b2e","#1a1a1c");
@@ -346,17 +366,18 @@ function drawIso(){
   fit(IS,40);
 }
 var depth=document.getElementById("depth");
-[].forEach.call(depth.children,function(b){b.onclick=function(){ist.D=+b.dataset.d;[].forEach.call(depth.children,function(c){c.setAttribute("aria-pressed",c===b)});drawIso()}});
-document.getElementById("bk").oninput=function(e){ist.back=+e.target.value*10;drawIso()};
-document.getElementById("dw").oninput=function(e){ist.W=+e.target.value*10;drawIso()};
-document.getElementById("eye").oninput=function(e){ist.eye=+e.target.value;drawIso()};
-document.getElementById("ighost").onchange=function(e){ist.ghost=e.target.checked;drawIso()};
-document.getElementById("yaw").oninput=function(e){ist.yaw=+e.target.value;drawIso()};
+function drawIsos(){panels.forEach(drawIso)}
+function setGaze(){var gy=+document.getElementById("gy").value,gp=+document.getElementById("gp").value;panels.forEach(function(pn){ist.gaze[pn.m.id]={gy:gy,gp:gp}});drawIsos()}
+[].forEach.call(depth.children,function(b){b.onclick=function(){ist.D=+b.dataset.d;[].forEach.call(depth.children,function(c){c.setAttribute("aria-pressed",c===b)});drawIsos()}});
+document.getElementById("bk").oninput=function(e){ist.back=+e.target.value*10;drawIsos()};
+document.getElementById("dw").oninput=function(e){ist.W=+e.target.value*10;drawIsos()};
+document.getElementById("eye").oninput=function(e){ist.eye=+e.target.value;drawIsos()};
+document.getElementById("ighost").onchange=function(e){ist.ghost=e.target.checked;drawIsos()};
+document.getElementById("yaw").oninput=function(e){ist.yaw=+e.target.value;drawIsos()};
 window.addEventListener("pointerup",function(){ist.drag=false});
-document.getElementById("gy").oninput=function(e){ist.gy=+e.target.value;drawIso()};
-document.getElementById("gp").oninput=function(e){ist.gp=+e.target.value;drawIso()};
-document.getElementById("gc").onclick=function(){ist.gy=null;ist.gp=null;drawIso()};
-var _draw=draw;draw=function(){_draw();drawIso()};
+document.getElementById("gy").oninput=setGaze;
+document.getElementById("gp").oninput=setGaze;
+document.getElementById("gc").onclick=function(){ist.gaze={};drawIsos()};
 draw();
 </script>
 </body>
