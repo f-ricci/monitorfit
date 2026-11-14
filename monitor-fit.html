@@ -4,148 +4,213 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Monitor fit on your desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f7f6f3;--ink:#1d1d1b;--mute:#6b6a66;--line:#d8d6cf;--shelfline:#c9c6bd;--desk:#e4e1da;--bezel:#1f1f22;--card:#fff}
-@media (prefers-color-scheme:dark){:root{--bg:#1b1b1a;--ink:#eceae4;--mute:#a19f98;--line:#3a3936;--shelfline:#4a4945;--desk:#3a3834;--bezel:#0c0c0d;--card:#262624}}
+:root{--bg:#f6f7f9;--ink:#1b1f24;--mute:#5b6470;--line:#d9dde3;--rule:#eef0f3;--card:#fff;--soft:#f2f4f6;--dash-soft:#e3a6cf;--sel-bg:#eaf1ff;--sel-ink:#1d4ed8;--sel-line:#bfd3fb;--accent:#2563eb;--shelfline:#aab2bd;--desk:#fff;--bezel:#1b1f24;--mine-ink:#a3307e}
+@media (prefers-color-scheme:dark){:root{--bg:#111418;--ink:#e6e9ee;--mute:#9aa3ae;--line:#2c323a;--rule:#232930;--card:#181c21;--soft:#232930;--dash-soft:#7a3d66;--sel-bg:#172554;--sel-ink:#9db8ff;--sel-line:#1e3a8a;--accent:#5b8cff;--shelfline:#4a525d;--desk:#20252c;--bezel:#0b0d10;--mine-ink:#e88cc8}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif}
+body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.45 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+button,input{font:inherit;color:inherit}
+button{border-radius:0}
 main{margin:0;padding:0}
-.pill{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:5px 12px;cursor:pointer}
-.legend{display:flex;flex-wrap:wrap;gap:16px;font-size:13px;color:var(--mute);margin:0 0 10px}
-.legend span{display:flex;align-items:center;gap:6px}
-.lg{width:14px;height:14px;border-radius:3px;display:inline-block;border:1px solid var(--line)}
-.lg.a{background:#fff6c8}.lg.b{background:transparent}.lg.c{background:#2a2a2a}
-svg.iso polygon.q{cursor:crosshair}
-.bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
-.bar button{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:7px 14px;cursor:pointer;display:flex;align-items:center;gap:8px}
-.bar button .sw{width:10px;height:10px;border-radius:3px}
-.bar button[aria-pressed=true]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
-.row{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin:6px 0 14px;color:var(--mute);font-size:14px}
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
-.seg button{font:inherit;font-size:13px;border:0;background:var(--card);color:var(--ink);padding:6px 12px;cursor:pointer}
-.seg button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
-input[type=range]{width:220px}
-label.ck{display:flex;gap:6px;align-items:center;cursor:pointer}
-.stage{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px;overflow:hidden}
+input[type=range]{width:100%;margin:0;accent-color:var(--accent)}
+input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px;margin:0}
 svg{display:block;width:100%;height:auto}
-.duo{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:0}
-.stage.duo{padding:0}
-.stage.duo+.stage.duo{margin-top:20px}
-#panels.multi .duo>div:not(.foot){height:auto;padding:0 10px}
-#panels.multi .duo svg{height:auto}
-.duo>div{height:clamp(320px,64vh,760px);padding:10px}
-.duo svg{height:100%}
-.duo>.foot{grid-column:1/-1;height:auto;padding:0;display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line)}
-.foot>*{padding:10px 14px}
-.foot>.legend{margin:0;border-left:1px solid var(--line)}
-.key{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:var(--mute)}
-.key span{display:flex;align-items:center;gap:6px}
-.key i{width:16px;height:11px;border-radius:2px;display:inline-block}
-.duo>div:nth-child(2){border-left:1px solid var(--line)}
-@media (max-width:1100px){.duo{grid-template-columns:1fr}.duo>div:nth-child(2){border-left:0;border-top:1px solid var(--line)}.duo>div,.duo svg{height:auto}.duo>.foot{grid-template-columns:1fr}.foot>.legend{border-left:0;border-top:1px solid var(--line)}}
-.layout{display:grid;grid-template-columns:290px minmax(0,1fr);align-items:start}
-.content{padding:20px;min-width:0}
-.side{background:var(--card);border-right:1px solid var(--line);padding:16px;position:sticky;top:0;height:100vh;overflow:auto}
-.sec{border-top:1px solid var(--line);margin-top:16px;padding-top:14px}
-.sec h3{font-size:15px;margin:0 0 10px}
-.fld{margin-bottom:12px}
-.fl{display:flex;justify-content:space-between;font-size:13px;color:var(--mute);margin-bottom:4px}
-.fl b{color:var(--ink);font-weight:600}
-.fl.sm{font-size:12px;margin-top:6px}
-.side input[type=range]{width:100%}
-.side label.ck{font-size:14px;margin-bottom:12px}
-.side .pill{margin-top:8px}
-.anchors{display:grid;grid-template-columns:repeat(2,1fr);gap:4px}
-.anchors button{font:inherit;font-size:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:6px;padding:6px 4px;cursor:pointer}
-.anchors button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.anchors [data-p=bc]{grid-column:1/-1}
-.side .lbl{display:block;font-size:12px;color:var(--mute);text-transform:uppercase;letter-spacing:.04em;margin:0 0 6px}
-#mineBtn,#cmpBtn{width:100%;font:inherit;font-size:14px;display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 10px;cursor:pointer;margin-bottom:18px;text-align:left}
-#mineBtn .nm,#cmpBtn .nm{flex:1}
-#mineBtn .sw{width:10px;height:10px;border-radius:3px}
-.pickdlg{border:0;padding:24px;background:transparent;max-width:none;max-height:none;width:100vw;height:100vh;margin:0}
-.pickdlg::backdrop{background:rgba(20,20,18,.55)}
-.pickdlg[open]{display:flex;flex-direction:column;align-items:center}
-.pickdlg input[type=search]{width:min(520px,100%);font:inherit;font-size:16px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:10px 14px;margin-bottom:16px}
-.pickdlg .grid{--row:118px;width:min(960px,100%);display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:var(--row);gap:12px;max-height:calc(4*var(--row) + 36px);overflow:auto}
-.pickdlg .card{font:inherit;text-align:left;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;padding:12px 14px;cursor:pointer;display:flex;flex-direction:column;gap:4px}
-.pickdlg .card:hover{border-color:var(--ink)}
-.pickdlg .card[aria-current=true]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
-.pickdlg .card b{font-size:15px;display:flex;align-items:center;gap:8px}
-.pickdlg .card[aria-pressed=true]{border-color:var(--sel);box-shadow:inset 0 0 0 2px var(--sel)}
-.pickdlg .card .tick{margin-left:auto;font-size:14px;color:var(--ink)}
-.pickdlg .done{margin-top:16px;font:inherit;font-size:14px;border:0;background:var(--ink);color:var(--bg);border-radius:999px;padding:9px 22px;cursor:pointer}
-.pickdlg .card span{font-size:13px;color:var(--mute)}
-.pickdlg .none{grid-column:1/-1;color:var(--card);text-align:center}
-@media (max-width:700px){.pickdlg .grid{grid-template-columns:repeat(2,1fr)}}
-.side #picks{flex-direction:column;gap:4px;margin:0}
-.side #picks button{border-radius:8px;justify-content:flex-start;text-align:left}
+svg.iso polygon.q{cursor:crosshair}
+/* top bar */
+.top{display:flex;flex-wrap:wrap;align-items:stretch;background:var(--card);border-bottom:1px solid var(--line)}
+.top>div{padding:14px 20px;letter-spacing:.06em}
+.top .brand{font-weight:700;font-size:15px;letter-spacing:.08em;border-right:1px solid var(--line)}
+.top .crumb{color:var(--mute);flex:1 1 200px}
+.top .count{border-left:1px solid var(--line)}
+/* layout */
+.layout{display:grid;grid-template-columns:300px minmax(0,1fr);align-items:start}
+.content{padding:24px;min-width:0}
+.side{background:var(--card);border-right:1px solid var(--line);position:sticky;top:0;height:100vh;overflow:auto}
+.blk{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.blk:last-child{border-bottom:0}
+.lbl{font-size:11px;letter-spacing:.1em;color:var(--mute);text-transform:uppercase}
+.field{display:flex;align-items:center;gap:10px;min-height:44px;padding:0 12px;border:1px solid var(--line);background:var(--card);text-align:left;cursor:pointer;width:100%}
+.field .nm{flex:1 1 auto}
+.field.dashed{border-style:dashed;border-color:var(--shelfline)}
+.sw{width:12px;height:12px;flex:none}
+.list{display:flex;flex-direction:column;border:1px solid var(--line)}
+.list:empty{display:none}
+.list button{display:flex;align-items:center;gap:10px;min-height:44px;padding:0 12px;border:0;border-bottom:1px solid var(--line);background:var(--card);text-align:left;cursor:pointer}
+.list button:last-child{border-bottom:0}
+.list button .nm{flex:1 1 auto}
+.list button .st{color:var(--mute)}
+.list button[aria-pressed=true]{background:var(--sel-bg);color:var(--sel-ink)}
+.list button[aria-pressed=true] .st{color:var(--sel-ink)}
+.anchors{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border:1px solid var(--line)}
+.anchors button{min-height:44px;border:0;border-bottom:1px solid var(--line);background:var(--card);cursor:pointer}
+.anchors button:nth-child(odd):not([data-p=bc]){border-right:1px solid var(--line)}
+.anchors [data-p=bc]{grid-column:1/-1;border-bottom:0}
+.anchors button[aria-pressed=true],.seg button[aria-pressed=true]{background:var(--sel-bg);color:var(--sel-ink)}
+.seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid var(--line)}
+.seg button{min-height:40px;border:0;border-right:1px solid var(--line);background:var(--card);cursor:pointer}
+.seg button:last-child{border-right:0}
+.fld{display:flex;flex-direction:column;gap:6px}
+.fl{display:flex;justify-content:space-between;color:var(--mute);text-transform:uppercase}
+.fl b{color:var(--ink);font-weight:700}
+.fl.sm{font-size:11px;letter-spacing:.06em}
+label.ck{display:flex;align-items:center;gap:10px;min-height:32px;cursor:pointer;text-transform:uppercase}
+.plain{min-height:44px;border:1px solid var(--line);background:var(--card);cursor:pointer;text-transform:uppercase}
+/* panels */
+.panel{border:1px solid var(--line);background:var(--card)}
+.panel+.panel{margin-top:24px}
+.phead{display:flex;flex-wrap:wrap;border-bottom:1px solid var(--line)}
+.phead>div{padding:10px 14px}
+.pid{font-weight:700;border-right:1px solid var(--line);text-transform:uppercase}
+.pdiff{color:var(--mute);flex:1 1 200px}
+.duo{display:grid;grid-template-columns:1fr 1fr}
+.half{height:clamp(320px,60vh,720px);padding:16px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.half+.half{border-left:1px solid var(--line)}
+.half svg{flex:1 1 0;min-height:0;height:100%}
+.hl{font-size:11px;letter-spacing:.1em;color:var(--mute)}
+#panels.multi .half{height:auto}
+#panels.multi .half svg{flex:none;height:auto}
+.foot{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line);font-size:12px}
+.foot>*{padding:10px 14px;display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center;text-transform:uppercase}
+.foot>.legend{border-left:1px solid var(--line);color:var(--mute)}
+.foot span{display:flex;align-items:center;gap:8px}
+.key i{width:14px;height:10px;display:inline-block}
+.lg{width:10px;height:10px;display:inline-block;border:1px solid var(--ink)}
+.lg.a{background:#fff6c8}.lg.b{background:transparent}.lg.c{background:var(--ink)}
+@media (max-width:1100px){.duo,.foot{grid-template-columns:1fr}.half{height:auto}.half svg{flex:none;height:auto}.half+.half,.foot>.legend{border-left:0;border-top:1px solid var(--line)}}
 @media (max-width:900px){.layout{grid-template-columns:1fr}.side{position:static;height:auto;overflow:visible;border-right:0;border-bottom:1px solid var(--line)}.content{padding:16px}}
+/* pickers */
+.pickdlg{border:0;padding:48px 24px;background:transparent;max-width:none;max-height:none;width:100vw;height:100vh;margin:0}
+.pickdlg::backdrop{background:rgba(27,31,36,.42)}
+.pickdlg[open]{display:flex;justify-content:center;align-items:flex-start}
+.dlg{width:100%;max-width:1080px;max-height:100%;background:var(--card);color:var(--ink);border:1px solid var(--line);display:flex;flex-direction:column}
+.dhead{display:flex;flex-wrap:wrap;align-items:stretch;border-bottom:1px solid var(--line)}
+.dt{padding:14px 20px;font-weight:700;letter-spacing:.08em;border-right:1px solid var(--line);display:flex;align-items:center}
+.dsearch{flex:1 1 320px;display:flex;align-items:center;gap:12px;padding:0 20px;min-height:52px}
+.dsearch input{background:transparent;border:0;outline:none;width:100%;min-width:0;padding:0}
+.kbd{border:1px solid var(--line);padding:2px 6px;color:var(--mute);font-size:11px}
+.dcount{padding:14px 20px;border-left:1px solid var(--line);display:flex;align-items:center;gap:8px;color:var(--mute)}
+.dcount b{color:var(--ink)}
+.dfilter{display:flex;flex-wrap:wrap;gap:8px;padding:12px 20px;border-bottom:1px solid var(--line);align-items:center}
+.dfilter .lbl{margin-right:6px}
+.dfilter button{min-height:32px;padding:0 12px;border:1px solid var(--line);background:var(--card);cursor:pointer}
+.dfilter button[aria-pressed=true]{border-color:var(--sel-line);background:var(--sel-bg);color:var(--sel-ink)}
+.dfilter .yours{margin-left:auto;color:var(--mute)}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;padding:20px;overflow:auto;min-height:0}
+.card{position:relative;display:flex;flex-direction:column;gap:10px;min-height:196px;padding:14px;border:1px solid var(--line);background:var(--card);text-align:left;cursor:pointer}
+.card:hover{border-color:var(--shelfline)}
+.card.on{border:2px solid var(--sel);padding:13px}
+.card .pv{height:100px;border-bottom:1px solid var(--rule);display:flex;align-items:flex-end}
+.card .pv svg{height:88px}
+.card b{font-size:14px}
+.card .meta{color:var(--mute);padding-right:36px}
+.card .ind{position:absolute;right:12px;bottom:12px;width:28px;height:28px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--mute);font-size:16px}
+.card.on .ind{border-color:var(--sel);color:var(--ink);font-size:14px}
+.grid .none{grid-column:1/-1;color:var(--mute);text-align:center;padding:24px}
+.dfoot{display:flex;flex-wrap:wrap;align-items:stretch;border-top:1px solid var(--line)}
+.dkey{flex:1 1 320px;padding:14px 20px;color:var(--mute);display:flex;flex-wrap:wrap;gap:6px 20px;align-items:center}
+.dkey span{display:flex;align-items:center;gap:8px}
+.dkey i{width:14px;height:10px;border:1.5px dashed #c2459b}
+.done{min-height:52px;padding:0 28px;border:0;border-left:1px solid var(--line);background:var(--sel-bg);color:var(--sel-ink);font-weight:700;letter-spacing:.08em;cursor:pointer}
+@media (max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.pickdlg{padding:12px}}
 </style>
 </head>
 <body>
 <main>
+<header class="top">
+  <div class="brand">MONITOR/FIT</div>
+  <div class="crumb">FRONT VIEW + CHAIR VIEW</div>
+  <div class="count" id="cnt"></div>
+</header>
 <div class="layout">
 <aside class="side">
-  <div class="lbl">My monitor</div>
-  <button type="button" id="mineBtn" aria-haspopup="dialog"><span class="sw"></span><span class="nm"></span><span aria-hidden="true">▾</span></button>
-  <div class="lbl">Selected for comparison</div>
-  <button type="button" id="cmpBtn" aria-haspopup="dialog"><span class="nm">Add or remove monitors</span><span aria-hidden="true">▾</span></button>
-  <div class="bar" id="picks"></div>
+  <section class="blk">
+    <div class="lbl">My monitor</div>
+    <button type="button" class="field" id="mineBtn" aria-haspopup="dialog"><span class="sw"></span><span class="nm"></span><span aria-hidden="true">[+]</span></button>
+  </section>
 
-  <section class="sec">
-    <h3>Front view</h3>
-    <div class="fld"><span class="fl">Anchor to my monitor</span>
-      <div class="anchors" id="pos">
-        <button data-p="tl" aria-pressed="false">Top left</button>
-        <button data-p="tr" aria-pressed="false">Top right</button>
-        <button data-p="bl" aria-pressed="false">Bottom left</button>
-        <button data-p="br" aria-pressed="false">Bottom right</button>
-        <button data-p="bc" aria-pressed="true">Bottom centre</button>
-      </div>
+  <section class="blk">
+    <div class="lbl">Compare</div>
+    <button type="button" class="field dashed" id="cmpBtn" aria-haspopup="dialog">+ ADD OR REMOVE MONITORS</button>
+    <div class="list" id="picks"></div>
+  </section>
+
+  <section class="blk">
+    <div class="lbl">Front view · anchor</div>
+    <div class="anchors" id="pos">
+      <button type="button" data-p="tl" aria-pressed="false" aria-label="Top left">┌ TOP L</button>
+      <button type="button" data-p="tr" aria-pressed="false" aria-label="Top right">TOP R ┐</button>
+      <button type="button" data-p="bl" aria-pressed="false" aria-label="Bottom left">└ BOT L</button>
+      <button type="button" data-p="br" aria-pressed="false" aria-label="Bottom right">BOT R ┘</button>
+      <button type="button" data-p="bc" aria-pressed="true" aria-label="Bottom centre">┴ BOTTOM CENTRE</button>
     </div>
     <label class="ck"><input type="checkbox" id="ghost" checked> Show my monitor</label>
   </section>
 
-  <section class="sec">
-    <h3>Seen from your chair</h3>
-    <div class="fld"><span class="fl">Desk depth</span>
+  <section class="blk">
+    <div class="lbl">Chair view</div>
+    <div class="fld"><span class="fl">Desk depth · cm</span>
       <div class="seg" id="depth">
-        <button data-d="600" aria-pressed="false">60 cm</button>
-        <button data-d="700" aria-pressed="true">70 cm</button>
-        <button data-d="800" aria-pressed="false">80 cm</button>
+        <button type="button" data-d="600" aria-pressed="false">60</button>
+        <button type="button" data-d="700" aria-pressed="true">70</button>
+        <button type="button" data-d="800" aria-pressed="false">80</button>
       </div>
     </div>
-    <div class="fld"><label class="fl" for="dw">Desk width <b id="dwv"></b></label><input type="range" id="dw" min="100" max="300" step="5" value="240"></div>
-    <div class="fld"><label class="fl" for="bk">Stand from back edge <b id="bkv"></b></label><input type="range" id="bk" min="0" max="30" step="1" value="0"></div>
-    <div class="fld"><label class="fl" for="eye">Eyes behind desk edge <b id="eyev"></b></label><input type="range" id="eye" min="100" max="500" step="10" value="250"></div>
-    <div class="fld"><label class="fl" for="yaw">View angle</label><input type="range" id="yaw" min="-55" max="55" step="1" value="28"></div>
+    <div class="fld"><label class="fl" for="dw"><span>Desk width</span><b id="dwv"></b></label><input type="range" id="dw" min="100" max="300" step="5" value="240"></div>
+    <div class="fld"><label class="fl" for="bk"><span>Stand from back</span><b id="bkv"></b></label><input type="range" id="bk" min="0" max="30" step="1" value="0"></div>
+    <div class="fld"><label class="fl" for="eye"><span>Eyes behind edge</span><b id="eyev"></b></label><input type="range" id="eye" min="100" max="500" step="10" value="250"></div>
+    <div class="fld"><label class="fl" for="yaw"><span>View angle</span><b id="yawv"></b></label><input type="range" id="yaw" min="-55" max="55" step="1" value="28"></div>
     <label class="ck"><input type="checkbox" id="ighost" checked> Show my monitor</label>
     <div class="fld"><span class="fl">Where you look</span>
       <label class="fl sm" for="gy">Left / right</label><input type="range" id="gy" min="-70" max="70" step="1" value="0">
       <label class="fl sm" for="gp">Up / down</label><input type="range" id="gp" min="-45" max="25" step="1" value="0">
-      <button class="pill" id="gc">Back to centre</button>
     </div>
+    <button type="button" class="plain" id="gc">↺ Gaze back to centre</button>
   </section>
 </aside>
 <div class="content">
 
 <div id="panels"></div>
 <template id="panelTpl">
-<div class="stage duo">
-  <div><svg class="front" role="img"></svg></div>
-  <div><svg class="iso" role="img"></svg></div>
-  <div class="foot"><div class="key"></div><div class="legend"><span><i class="lg a"></i>Easy focus, within 15° of your gaze</span><span><i class="lg b"></i>Eye movement, 15–30°</span><span><i class="lg c"></i>Head turn, past 30°</span><span>Click or drag on the screen to look there.</span></div></div>
-</div>
+<article class="panel">
+  <div class="phead"><div class="pid"></div><div class="pdiff"></div></div>
+  <div class="duo">
+    <div class="half"><div class="hl">FRONT</div><svg class="front" role="img"></svg></div>
+    <div class="half"><div class="hl">CHAIR</div><svg class="iso" role="img"></svg></div>
+  </div>
+  <div class="foot"><div class="key"></div><div class="legend"><span><i class="lg a"></i>≤15° focus</span><span><i class="lg b"></i>15–30° eyes</span><span><i class="lg c"></i>&gt;30° head</span><span>Click or drag on the screen to look there</span></div></div>
+</article>
 </template>
+
 <dialog id="pick" class="pickdlg" aria-label="Choose your monitor">
-  <input type="search" id="pq" placeholder="Search monitors" aria-label="Search monitors" autocomplete="off">
-  <div class="grid" id="pgrid"></div>
+  <div class="dlg">
+    <div class="dhead">
+      <div class="dt">MY MONITOR</div>
+      <label class="dsearch"><svg width="16" height="16" viewBox="0 0 16 16" style="width:16px;flex:none" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.5"></circle><path d="M11 11 L15 15" stroke="currentColor" stroke-width="1.5"></path></svg><input type="search" id="pq" placeholder="Search monitors, sizes, resolutions" aria-label="Search monitors" autocomplete="off"><span class="kbd">ESC</span></label>
+    </div>
+    <div class="dfilter" id="pfilter"></div>
+    <div class="grid" id="pgrid"></div>
+    <div class="dfoot">
+      <div class="dkey"><span><i></i>CURRENT, TO SCALE</span><span>CLICK A CARD TO MAKE IT YOURS</span></div>
+      <button type="button" class="done" id="pdone">CLOSE</button>
+    </div>
+  </div>
 </dialog>
 <dialog id="cpick" class="pickdlg" aria-label="Choose monitors to compare">
-  <input type="search" id="cq" placeholder="Search monitors" aria-label="Search monitors" autocomplete="off">
-  <div class="grid" id="cgrid"></div>
-  <button type="button" class="done" id="cdone">Done</button>
+  <div class="dlg">
+    <div class="dhead">
+      <div class="dt">COMPARE</div>
+      <label class="dsearch"><svg width="16" height="16" viewBox="0 0 16 16" style="width:16px;flex:none" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.5"></circle><path d="M11 11 L15 15" stroke="currentColor" stroke-width="1.5"></path></svg><input type="search" id="cq" placeholder="Search monitors, sizes, resolutions" aria-label="Search monitors" autocomplete="off"><span class="kbd">ESC</span></label>
+      <div class="dcount" id="ccount"></div>
+    </div>
+    <div class="dfilter" id="cfilter"></div>
+    <div class="grid" id="cgrid"></div>
+    <div class="dfoot">
+      <div class="dkey"><span><i></i>YOUR MONITOR, TO SCALE</span><span>CLICK A CARD TO ADD OR REMOVE IT</span></div>
+      <button type="button" class="done" id="cdone">DONE</button>
+    </div>
+  </div>
 </dialog>
 </div>
 </div>
@@ -168,6 +233,7 @@ var st={show:["pa32"],colors:{},mine:"pa27",compare:M.map(function(m){return m.i
 var NS="http://www.w3.org/2000/svg", svg=null, panels=[];
 function el(t,a,p){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);(p||svg).appendChild(e);return e}
 function tx(x,y,s,a){var e=el("text",Object.assign({x:x,y:y,"font-size":22,fill:"var(--mute)","font-family":"inherit"},a||{}));e.textContent=s;return e}
+function mmL(v){return Math.round(v)+" MM"}
 function cm(mm){return (Math.round(mm/10*10)/10).toFixed(1).replace(/\.0$/,"")+" cm"}
 function byId(id){return M.filter(function(m){return m.id===id})[0]}
 function mine(){return byId(st.mine)}
@@ -185,29 +251,29 @@ function assignColors(){
 // st.pos names the point of my monitor the compared one shares: b/t + l/c/r
 function left(m){var y=mine();return st.pos[1]==="l"?-y.bw/2:st.pos[1]==="c"?-m.bw/2:y.bw/2-m.bw}
 function base(m){var y=mine();return st.pos[0]==="b"?LIFT:LIFT+y.bh-m.bh}
-function dim(x1,x2,y,label,c,below){
+function dim(x1,x2,y,label,c,below,tc){
   c=c||"var(--ink)";
   el("line",{x1:x1,y1:y,x2:x2,y2:y,stroke:c,"stroke-width":2});
   el("line",{x1:x1,y1:y-10,x2:x1,y2:y+10,stroke:c,"stroke-width":2});
   el("line",{x1:x2,y1:y-10,x2:x2,y2:y+10,stroke:c,"stroke-width":2});
-  tx((x1+x2)/2,below?y+32:y-10,label,{"text-anchor":"middle",fill:c,"font-weight":600});
+  tx((x1+x2)/2,below?y+34:y-12,label,{"text-anchor":"middle",fill:tc||c,"font-weight":700,"font-size":24});
 }
-function vdim(x,b,t,label,c,toLeft){
+function vdim(x,b,t,label,c,toLeft,tc){
   c=c||"var(--ink)";
   el("line",{x1:x,y1:-b,x2:x,y2:-t,stroke:c,"stroke-width":2});
   el("line",{x1:x-10,y1:-t,x2:x+10,y2:-t,stroke:c,"stroke-width":2});
   el("line",{x1:x-10,y1:-b,x2:x+10,y2:-b,stroke:c,"stroke-width":2});
-  tx(x+(toLeft?-12:12),-(b+t)/2,label,{fill:c,"font-weight":600,"text-anchor":toLeft?"end":"start"});
+  tx(x+(toLeft?-14:14),-(b+t)/2+8,label,{fill:tc||c,"font-weight":700,"font-size":24,"text-anchor":toLeft?"end":"start"});
 }
 function monitor(m,x,b,ghost){
   var y=-(b+m.bh), foot=b-LIFT, g=el("g",{});
-  if(ghost){el("rect",{x:x,y:y,width:m.bw,height:m.bh,rx:6,fill:"none",stroke:colorOf(m),"stroke-width":3,"stroke-dasharray":"12 9",opacity:.9},g);return}
+  if(ghost){el("rect",{x:x,y:y,width:m.bw,height:m.bh,fill:"none",stroke:colorOf(m),"stroke-width":3,"stroke-dasharray":"12 9",opacity:.9},g);return}
   var cx=x+m.bw/2;
-  el("rect",{x:cx-130,y:-foot-10,width:260,height:10,rx:5,fill:"#9a9a9e"},g);
-  el("rect",{x:cx-30,y:-(b+m.bh*0.55),width:60,height:LIFT+m.bh*0.55-6,fill:"#a7a7ab"},g);
-  el("rect",{x:x,y:y,width:m.bw,height:m.bh,rx:6,fill:"var(--bezel)"},g);
+  el("rect",{x:cx-130,y:-foot-10,width:260,height:10,fill:"var(--bezel)"},g);
+  el("rect",{x:cx-30,y:-(b+m.bh*0.55),width:60,height:LIFT+m.bh*0.55-6,fill:"var(--bezel)"},g);
+  el("rect",{x:x,y:y,width:m.bw,height:m.bh,fill:"var(--bezel)"},g);
   var side=(m.bw-m.pw)/2;
-  el("rect",{x:x+side,y:y+side,width:m.pw,height:m.ph,rx:2,fill:colorOf(m),"fill-opacity":.32,stroke:colorOf(m),"stroke-width":3},g);
+  el("rect",{x:x+side,y:y+side,width:m.pw,height:m.ph,fill:colorOf(m),"fill-opacity":.35,stroke:colorOf(m),"stroke-width":3},g);
 }
 // crop the drawing to what was drawn, so it fills its half of the panel
 function fit(s,pad){var b=s.getBBox();s.setAttribute("viewBox",[b.x-pad,b.y-pad,b.width+2*pad,b.height+2*pad].map(Math.round).join(" "))}
@@ -219,21 +285,21 @@ function drawFront(m,key){
   // dims
   var y=mine(), yl=-y.bw/2, yt=LIFT+y.bh, hi=-Math.max(top,yt), L=Math.min(x,yl), R=Math.max(r,-yl);
   // compared monitor on top and right; my monitor, in its own colour, on the bottom and left
-  dim(x,r,hi-40,cm(m.bw)+" wide");
-  vdim(R+30,b,top,cm(m.bh)+" tall");
+  dim(x,r,hi-40,mmL(m.bw));
+  vdim(R+30,b,top,mmL(m.bh));
   if(st.ghost && m.id!==st.mine){
-    dim(yl,-yl,Math.max(0,LIFT-b)+40,cm(y.bw)+" wide",colorOf(y),true);
-    vdim(L-30,LIFT,yt,cm(y.bh)+" tall",colorOf(y),true);
+    dim(yl,-yl,Math.max(0,LIFT-b)+40,mmL(y.bw),colorOf(y),true,"var(--mine-ink)");
+    vdim(L-30,LIFT,yt,mmL(y.bh),colorOf(y),true,"var(--mine-ink)");
   }
   fit(svg,30);
   // legend: compared monitor solid (top and right sizes), mine dashed (bottom and left sizes)
   key.textContent="";
-  function item(mon,dashed,where){var sp=document.createElement("span"),i=document.createElement("i");
+  function item(mon,dashed,label){var sp=document.createElement("span"),i=document.createElement("i");
     i.style.cssText=dashed?"border:2px dashed "+colorOf(mon):"background:"+colorOf(mon);
-    sp.appendChild(i);sp.appendChild(document.createTextNode(mon.name+" · "+where));key.appendChild(sp)}
+    sp.appendChild(i);sp.appendChild(document.createTextNode(label));key.appendChild(sp)}
   var both=st.ghost && m.id!==st.mine;
-  item(m,false,(m.id===st.mine?"your monitor, ":"")+"sizes top and right");
-  if(both)item(y,true,"your monitor, sizes bottom and left");
+  item(m,false,m.name+(m.id===st.mine?" · yours":"")+" · top + right");
+  if(both)item(y,true,"Yours · bottom + left");
 }
 var picks=document.getElementById("picks");
 function sw(m){var s=document.createElement("span");s.className="sw";s.style.background=colorOf(m);return s}
@@ -244,66 +310,100 @@ function renderPicks(){
   st.show=st.show.filter(function(id){return listed.some(function(m){return m.id===id})});
   picks.textContent="";
   listed.forEach(function(m){
-    var b=document.createElement("button");b.setAttribute("aria-pressed",st.show.indexOf(m.id)>=0);
-    b.appendChild(sw(m));b.appendChild(document.createTextNode(m.name));
-    b.onclick=function(){st.show=st.show.indexOf(m.id)>=0?st.show.filter(function(id){return id!==m.id}):st.show.concat(m.id);renderPicks();draw()};
+    var on=st.show.indexOf(m.id)>=0,b=document.createElement("button");b.type="button";b.setAttribute("aria-pressed",on);
+    var n=document.createElement("span");n.className="nm";n.textContent=m.name;
+    var t=document.createElement("span");t.className="st";t.textContent=on?"ON":"OFF";
+    b.appendChild(sw(m));b.appendChild(n);b.appendChild(t);
+    b.onclick=function(){st.show=on?st.show.filter(function(id){return id!==m.id}):st.show.concat(m.id);renderPicks();draw()};
     picks.appendChild(b);
   });
+  document.getElementById("cnt").textContent=st.show.length+" COMPARED";
   renderPanels();
 }
+function signed(mm){return mm===0?"same":(mm>0?"+":"−")+cm(Math.abs(mm))}
 // one full panel per toggled monitor, in list order; just my monitor when none are toggled
 function renderPanels(){
-  var box=document.getElementById("panels"),tpl=document.getElementById("panelTpl");box.textContent="";
-  var ms=M.filter(function(m){return st.show.indexOf(m.id)>=0});if(!ms.length)ms=[mine()];
+  var box=document.getElementById("panels"),tpl=document.getElementById("panelTpl"),y=mine();box.textContent="";
+  var ms=M.filter(function(m){return st.show.indexOf(m.id)>=0});if(!ms.length)ms=[y];
   // several panels: halves shrink to their drawings so the stack stays compact
   box.classList.toggle("multi",ms.length>1);
-  panels=ms.map(function(m){
+  panels=ms.map(function(m,i){
     var n=tpl.content.firstElementChild.cloneNode(true);box.appendChild(n);
-    var f=n.querySelector(".front"),i=n.querySelector(".iso");
+    var f=n.querySelector(".front"),is=n.querySelector(".iso");
+    n.querySelector(".pid").textContent=String.fromCharCode(65+i%26)+" / "+m.name;
+    n.querySelector(".pdiff").textContent=m.id===st.mine?"Your monitor · "+cm(m.bw)+" × "+cm(m.bh):"vs "+y.name+" · "+signed(m.bw-y.bw)+" wide · "+signed(m.bh-y.bh)+" tall";
     f.setAttribute("aria-label","Front view of "+m.name+" with its dimensions");
-    i.setAttribute("aria-label","Axonometric view of the desk with "+m.name+", from the chair");
-    return {m:m,front:f,iso:i,key:n.querySelector(".key")};
+    is.setAttribute("aria-label","Axonometric view of the desk with "+m.name+", from the chair");
+    return {m:m,front:f,iso:is,key:n.querySelector(".key")};
   });
 }
-// my monitor: a button opening an overlay with search on top and a 4-column grid of every monitor
-var mineBtn=document.getElementById("mineBtn"), pick=document.getElementById("pick"), pq=document.getElementById("pq"), pgrid=document.getElementById("pgrid");
+// pickers: an overlay with search, filters and a 4-column grid of cards; each card previews its monitor against yours
+var mineBtn=document.getElementById("mineBtn"), pick=document.getElementById("pick"), pq=document.getElementById("pq"), pgrid=document.getElementById("pgrid"), pfilter=document.getElementById("pfilter");
+var cmpBtn=document.getElementById("cmpBtn"), cpick=document.getElementById("cpick"), cq=document.getElementById("cq"), cgrid=document.getElementById("cgrid"), cfilter=document.getElementById("cfilter"), cOrder=[];
+var FILTERS=[["all","All"],["flat","Flat"],["curved","Curved"],["u80","Under 80 cm"]], flt={p:"all",c:"all"};
 function showMine(){mineBtn.querySelector(".sw").style.background=MINE_COLOR;mineBtn.querySelector(".nm").textContent=mine().name}
-function card(m){
-  var c=document.createElement("button");c.type="button";c.className="card";
+function matches(m,term,f){
+  var hay=(m.name+" "+cm(m.bw)+" "+cm(m.bh)+" "+m.res+" "+m.curve).toLowerCase();
+  if(term&&hay.indexOf(term)<0)return false;
+  return f==="flat"?!m.R:f==="curved"?!!m.R:f==="u80"?m.bw<800:true;
+}
+function filterBar(box,k,render){
+  box.textContent="";
+  var l=document.createElement("span");l.className="lbl";l.textContent="Filter";box.appendChild(l);
+  FILTERS.forEach(function(f){var b=document.createElement("button");b.type="button";b.textContent=f[1].toUpperCase();b.setAttribute("aria-pressed",flt[k]===f[0]);
+    b.onclick=function(){flt[k]=f[0];filterBar(box,k,render);render()};box.appendChild(b)});
+  var y=mine(),t=document.createElement("span");t.className="yours";t.textContent="YOURS: "+y.name+" · "+(y.bw/10).toFixed(1)+" × "+(y.bh/10).toFixed(1)+" CM";box.appendChild(t);
+}
+// the monitor and yours stay to scale with each other and are scaled together to fill the card
+function preview(m,on,withMine){
+  var y=mine(),W=withMine?Math.max(m.bw,y.bw):m.bw,H=withMine?Math.max(m.bh,y.bh):m.bh;
+  var s=document.createElementNS(NS,"svg");s.setAttribute("viewBox",[-4,-4,W+8,H+8].join(" "));s.setAttribute("preserveAspectRatio","xMidYMax meet");s.setAttribute("aria-hidden","true");
+  el("rect",{x:(W-m.bw)/2,y:H-m.bh,width:m.bw,height:m.bh,fill:on?colorOf(m):"var(--soft)","fill-opacity":on?.85:1},s);
+  if(withMine)el("rect",{x:(W-y.bw)/2,y:H-y.bh,width:y.bw,height:y.bh,fill:"none",stroke:on?MINE_COLOR:"var(--dash-soft)","stroke-width":1.5,"stroke-dasharray":"6 4","vector-effect":"non-scaling-stroke"},s);
+  return s;
+}
+function card(m,on,withMine){
+  var c=document.createElement("button");c.type="button";c.className="card"+(on?" on":"");
+  if(on)c.style.setProperty("--sel",colorOf(m));
+  var pv=document.createElement("span");pv.className="pv";pv.appendChild(preview(m,on,withMine));c.appendChild(pv);
   var b=document.createElement("b");b.textContent=m.name;c.appendChild(b);
-  [cm(m.bw)+" × "+cm(m.bh),m.res+" · "+(m.R?"curved "+m.curve:"flat")].forEach(function(t){var sp=document.createElement("span");sp.textContent=t;c.appendChild(sp)});
+  var meta=document.createElement("span");meta.className="meta";
+  meta.appendChild(document.createTextNode((m.bw/10).toFixed(1)+" × "+(m.bh/10).toFixed(1)+" CM"));meta.appendChild(document.createElement("br"));
+  meta.appendChild(document.createTextNode(m.res+" · "+(m.R?m.curve:"FLAT")));c.appendChild(meta);
+  var ind=document.createElement("span");ind.className="ind";ind.setAttribute("aria-hidden","true");ind.textContent=on?"✓":"+";c.appendChild(ind);
   return c;
 }
 function noMatch(g){var n=document.createElement("div");n.className="none";n.textContent="No monitors match";g.appendChild(n)}
 function renderGrid(){
   var term=pq.value.trim().toLowerCase();pgrid.textContent="";
-  var rows=M.filter(function(m){return m.name.toLowerCase().indexOf(term)>=0});
+  var rows=M.filter(function(m){return matches(m,term,flt.p)});
   rows.forEach(function(m){
-    var c=card(m);c.setAttribute("aria-current",m.id===st.mine);
+    var cur=m.id===st.mine,c=card(m,cur,!cur);c.setAttribute("aria-current",cur);
     c.onclick=function(){st.mine=m.id;st.show=st.show.filter(function(id){return id!==m.id});pick.close();showMine();renderPicks();draw()};
     pgrid.appendChild(c);
   });
   if(!rows.length)noMatch(pgrid);
 }
-mineBtn.onclick=function(){pq.value="";renderGrid();pick.showModal();pq.focus()};
+mineBtn.onclick=function(){pq.value="";flt.p="all";filterBar(pfilter,"p",renderGrid);renderGrid();pick.showModal();pq.focus()};
 pq.oninput=renderGrid;
+document.getElementById("pdone").onclick=function(){pick.close()};
 pick.addEventListener("click",function(e){if(e.target===pick)pick.close()});
-// comparison: the same overlay, but cards toggle; selected ones sit first, in the order fixed when it opens
-var cmpBtn=document.getElementById("cmpBtn"), cpick=document.getElementById("cpick"), cq=document.getElementById("cq"), cgrid=document.getElementById("cgrid"), cOrder=[];
+// comparison: cards toggle; selected ones sit first, in the order fixed when it opens
 function renderCmp(){
   var term=cq.value.trim().toLowerCase();cgrid.textContent="";
-  var rows=cOrder.filter(function(m){return m.id!==st.mine&&m.name.toLowerCase().indexOf(term)>=0});
+  var rows=cOrder.filter(function(m){return m.id!==st.mine&&matches(m,term,flt.c)});
   rows.forEach(function(m){
-    var c=card(m),on=st.compare.indexOf(m.id)>=0;c.setAttribute("aria-pressed",on);
-    if(on){c.style.setProperty("--sel",colorOf(m));var t=document.createElement("i");t.className="tick";t.textContent="✓";c.querySelector("b").appendChild(t)}
+    var on=st.compare.indexOf(m.id)>=0,c=card(m,on,true);c.setAttribute("aria-pressed",on);
     c.onclick=function(){st.compare=on?st.compare.filter(function(id){return id!==m.id}):st.compare.concat(m.id);renderPicks();draw();renderCmp()};
     cgrid.appendChild(c);
   });
   if(!rows.length)noMatch(cgrid);
+  var cc=document.getElementById("ccount"),n=st.compare.filter(function(id){return id!==st.mine}).length;
+  cc.textContent="";var b=document.createElement("b");b.textContent=n;cc.appendChild(b);cc.appendChild(document.createTextNode(" SELECTED"));
 }
 cmpBtn.onclick=function(){
   cOrder=M.slice().sort(function(a,b){return (st.compare.indexOf(b.id)>=0)-(st.compare.indexOf(a.id)>=0)});
-  cq.value="";renderCmp();cpick.showModal();cq.focus();
+  cq.value="";flt.c="all";filterBar(cfilter,"c",renderCmp);renderCmp();cpick.showModal();cq.focus();
 };
 cq.oninput=renderCmp;
 document.getElementById("cdone").onclick=function(){cpick.close()};
@@ -374,12 +474,12 @@ function drawIso(pn){
   function look(x,y,h){var a=angs(x,y,h);ist.gaze[m.id]={gy:Math.round(a[0]),gp:Math.round(a[1])};document.getElementById("gy").value=ist.gaze[m.id].gy;document.getElementById("gp").value=ist.gaze[m.id].gp;drawIso(pn)}
   var gaze=bestA<8?best:null;
   // keyboard + mouse, centred on the desk
-  box(-180,180,D-230,D-100,0,22,"#2b2b2e","#1a1a1c");
-  box(240,300,D-210,D-110,0,30,"#d9d9dc","#aaa");
+  box(-180,180,D-230,D-100,0,22,"var(--card)");
+  box(240,300,D-210,D-110,0,30,"var(--card)");
   // chair
   var cy=eyeY+60;
-  box(-230,230,cy-200,cy+230,-310,-250,"#55565a","#3c3d40");
-  box(-230,230,cy+190,cy+240,-250,250,"#55565a","#3c3d40");
+  box(-230,230,cy-200,cy+230,-310,-250,"var(--card)");
+  box(-230,230,cy+190,cy+240,-250,250,"var(--card)");
   // sight lines
   var eye=[0,eyeY,EYEH],cH=topH-side-m.ph/2,L=inner[0],Rr=inner[inner.length-1],mid=f.pts[Math.floor(f.pts.length/2)];
   [[L[0],L[1],cH],[Rr[0],Rr[1],cH]].forEach(function(t){line3(eye,t,{stroke:"var(--ink)","stroke-width":2,"stroke-dasharray":"10 8"})});
@@ -390,6 +490,7 @@ function drawIso(pn){
   document.getElementById("eyev").textContent=(ist.eye/10)+" cm";
   document.getElementById("dwv").textContent=(ist.W/10)+" cm";
   document.getElementById("bkv").textContent=(ist.back/10)+" cm";
+  document.getElementById("yawv").textContent=ist.yaw+"°";
   fit(IS,40);
 }
 var depth=document.getElementById("depth");
