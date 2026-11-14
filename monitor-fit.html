@@ -25,7 +25,6 @@ svg.iso polygon.q{cursor:crosshair}
 .seg button{font:inherit;font-size:13px;border:0;background:var(--card);color:var(--ink);padding:6px 12px;cursor:pointer}
 .seg button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
 input[type=range]{width:220px}
-select{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:6px 10px}
 label.ck{display:flex;gap:6px;align-items:center;cursor:pointer}
 .stage{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px;overflow:hidden}
 svg{display:block;width:100%;height:auto}
@@ -56,21 +55,29 @@ svg{display:block;width:100%;height:auto}
 .side input[type=range]{width:100%}
 .side label.ck{font-size:14px;margin-bottom:12px}
 .side .pill{margin-top:8px}
-.anchors{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.anchors{display:grid;grid-template-columns:repeat(2,1fr);gap:4px}
 .anchors button{font:inherit;font-size:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:6px;padding:6px 4px;cursor:pointer}
 .anchors button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.anchors [data-p=tr]{grid-column:3}
+.anchors [data-p=bc]{grid-column:1/-1}
 .side .lbl{display:block;font-size:12px;color:var(--mute);text-transform:uppercase;letter-spacing:.04em;margin:0 0 6px}
-.side select{width:100%;margin-bottom:18px}
-.combo{position:relative;margin-bottom:12px}
-#comboBtn{width:100%;font:inherit;font-size:14px;display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 10px;cursor:pointer}
-.pop{position:absolute;z-index:5;left:0;right:0;top:calc(100% + 4px);background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);padding:6px}
-.pop input[type=search]{width:100%;font:inherit;font-size:14px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:6px;padding:6px 8px;margin-bottom:4px}
-#opts{max-height:280px;overflow:auto}
-#opts label{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;font-size:14px;cursor:pointer}
-#opts label:hover{background:var(--bg)}
-#opts .sep{border-top:1px solid var(--line);margin:4px 0}
-#opts .none{padding:6px 8px;font-size:13px;color:var(--mute)}
+#mineBtn,#cmpBtn{width:100%;font:inherit;font-size:14px;display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 10px;cursor:pointer;margin-bottom:18px;text-align:left}
+#mineBtn .nm,#cmpBtn .nm{flex:1}
+#mineBtn .sw{width:10px;height:10px;border-radius:3px}
+.pickdlg{border:0;padding:24px;background:transparent;max-width:none;max-height:none;width:100vw;height:100vh;margin:0}
+.pickdlg::backdrop{background:rgba(20,20,18,.55)}
+.pickdlg[open]{display:flex;flex-direction:column;align-items:center}
+.pickdlg input[type=search]{width:min(520px,100%);font:inherit;font-size:16px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:10px 14px;margin-bottom:16px}
+.pickdlg .grid{--row:118px;width:min(960px,100%);display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:var(--row);gap:12px;max-height:calc(4*var(--row) + 36px);overflow:auto}
+.pickdlg .card{font:inherit;text-align:left;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;padding:12px 14px;cursor:pointer;display:flex;flex-direction:column;gap:4px}
+.pickdlg .card:hover{border-color:var(--ink)}
+.pickdlg .card[aria-current=true]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.pickdlg .card b{font-size:15px;display:flex;align-items:center;gap:8px}
+.pickdlg .card[aria-pressed=true]{border-color:var(--sel);box-shadow:inset 0 0 0 2px var(--sel)}
+.pickdlg .card .tick{margin-left:auto;font-size:14px;color:var(--ink)}
+.pickdlg .done{margin-top:16px;font:inherit;font-size:14px;border:0;background:var(--ink);color:var(--bg);border-radius:999px;padding:9px 22px;cursor:pointer}
+.pickdlg .card span{font-size:13px;color:var(--mute)}
+.pickdlg .none{grid-column:1/-1;color:var(--card);text-align:center}
+@media (max-width:700px){.pickdlg .grid{grid-template-columns:repeat(2,1fr)}}
 .side #picks{flex-direction:column;gap:4px;margin:0}
 .side #picks button{border-radius:8px;justify-content:flex-start;text-align:left}
 @media (max-width:900px){.layout{grid-template-columns:1fr}.side{position:static;height:auto;overflow:visible;border-right:0;border-bottom:1px solid var(--line)}.content{padding:16px}}
@@ -80,16 +87,10 @@ svg{display:block;width:100%;height:auto}
 <main>
 <div class="layout">
 <aside class="side">
-  <label class="lbl" for="mine">My monitor</label>
-  <select id="mine"></select>
+  <div class="lbl">My monitor</div>
+  <button type="button" id="mineBtn" aria-haspopup="dialog"><span class="sw"></span><span class="nm"></span><span aria-hidden="true">▾</span></button>
   <div class="lbl">Selected for comparison</div>
-  <div class="combo" id="combo">
-    <button type="button" id="comboBtn" aria-haspopup="listbox" aria-expanded="false"><span>Add or remove monitors</span><span aria-hidden="true">▾</span></button>
-    <div class="pop" id="pop" hidden>
-      <input type="search" id="q" placeholder="Search monitors" aria-label="Search monitors" autocomplete="off">
-      <div id="opts" role="listbox" aria-multiselectable="true"></div>
-    </div>
-  </div>
+  <button type="button" id="cmpBtn" aria-haspopup="dialog"><span class="nm">Add or remove monitors</span><span aria-hidden="true">▾</span></button>
   <div class="bar" id="picks"></div>
 
   <section class="sec">
@@ -99,8 +100,8 @@ svg{display:block;width:100%;height:auto}
         <button data-p="tl" aria-pressed="false">Top left</button>
         <button data-p="tr" aria-pressed="false">Top right</button>
         <button data-p="bl" aria-pressed="false">Bottom left</button>
-        <button data-p="bc" aria-pressed="true">Bottom centre</button>
         <button data-p="br" aria-pressed="false">Bottom right</button>
+        <button data-p="bc" aria-pressed="true">Bottom centre</button>
       </div>
     </div>
     <label class="ck"><input type="checkbox" id="ghost" checked> Show my monitor</label>
@@ -137,6 +138,15 @@ svg{display:block;width:100%;height:auto}
   <div class="foot"><div class="key"></div><div class="legend"><span><i class="lg a"></i>Easy focus, within 15° of your gaze</span><span><i class="lg b"></i>Eye movement, 15–30°</span><span><i class="lg c"></i>Head turn, past 30°</span><span>Click or drag on the screen to look there.</span></div></div>
 </div>
 </template>
+<dialog id="pick" class="pickdlg" aria-label="Choose your monitor">
+  <input type="search" id="pq" placeholder="Search monitors" aria-label="Search monitors" autocomplete="off">
+  <div class="grid" id="pgrid"></div>
+</dialog>
+<dialog id="cpick" class="pickdlg" aria-label="Choose monitors to compare">
+  <input type="search" id="cq" placeholder="Search monitors" aria-label="Search monitors" autocomplete="off">
+  <div class="grid" id="cgrid"></div>
+  <button type="button" class="done" id="cdone">Done</button>
+</dialog>
 </div>
 </div>
 </main>
@@ -225,8 +235,7 @@ function drawFront(m,key){
   item(m,false,(m.id===st.mine?"your monitor, ":"")+"sizes top and right");
   if(both)item(y,true,"your monitor, sizes bottom and left");
 }
-var picks=document.getElementById("picks"), mineSel=document.getElementById("mine");
-var combo=document.getElementById("combo"), comboBtn=document.getElementById("comboBtn"), pop=document.getElementById("pop"), q=document.getElementById("q"), opts=document.getElementById("opts"), optOrder=[];
+var picks=document.getElementById("picks");
 function sw(m){var s=document.createElement("span");s.className="sw";s.style.background=colorOf(m);return s}
 // the monitors selected for comparison; my monitor is never one of them. Each one toggles its own panel
 function renderPicks(){
@@ -256,32 +265,50 @@ function renderPanels(){
     return {m:m,front:f,iso:i,key:n.querySelector(".key")};
   });
 }
-// comparison dropdown: selected ones sit on top, checked; the order is fixed when it opens so rows don't jump while toggling
-function renderOpts(){
-  var term=q.value.trim().toLowerCase();opts.textContent="";
-  var rows=optOrder.filter(function(m){return m.id!==st.mine&&m.name.toLowerCase().indexOf(term)>=0}),sep=false;
-  rows.forEach(function(m,i){
-    if(i&&!sep&&!m.wasOn&&rows[i-1].wasOn){var d=document.createElement("div");d.className="sep";opts.appendChild(d);sep=true}
-    var l=document.createElement("label"),c=document.createElement("input");l.setAttribute("role","option");
-    c.type="checkbox";c.checked=st.compare.indexOf(m.id)>=0;l.setAttribute("aria-selected",c.checked);
-    c.onchange=function(){st.compare=c.checked?st.compare.concat(m.id):st.compare.filter(function(id){return id!==m.id});l.setAttribute("aria-selected",c.checked);renderPicks();draw()};
-    l.appendChild(c);l.appendChild(document.createTextNode(m.name));opts.appendChild(l);
+// my monitor: a button opening an overlay with search on top and a 4-column grid of every monitor
+var mineBtn=document.getElementById("mineBtn"), pick=document.getElementById("pick"), pq=document.getElementById("pq"), pgrid=document.getElementById("pgrid");
+function showMine(){mineBtn.querySelector(".sw").style.background=MINE_COLOR;mineBtn.querySelector(".nm").textContent=mine().name}
+function card(m){
+  var c=document.createElement("button");c.type="button";c.className="card";
+  var b=document.createElement("b");b.textContent=m.name;c.appendChild(b);
+  [cm(m.bw)+" × "+cm(m.bh),m.res+" · "+(m.R?"curved "+m.curve:"flat")].forEach(function(t){var sp=document.createElement("span");sp.textContent=t;c.appendChild(sp)});
+  return c;
+}
+function noMatch(g){var n=document.createElement("div");n.className="none";n.textContent="No monitors match";g.appendChild(n)}
+function renderGrid(){
+  var term=pq.value.trim().toLowerCase();pgrid.textContent="";
+  var rows=M.filter(function(m){return m.name.toLowerCase().indexOf(term)>=0});
+  rows.forEach(function(m){
+    var c=card(m);c.setAttribute("aria-current",m.id===st.mine);
+    c.onclick=function(){st.mine=m.id;st.show=st.show.filter(function(id){return id!==m.id});pick.close();showMine();renderPicks();draw()};
+    pgrid.appendChild(c);
   });
-  if(!rows.length){var n=document.createElement("div");n.className="none";n.textContent="No monitors match";opts.appendChild(n)}
+  if(!rows.length)noMatch(pgrid);
 }
-function openCombo(){
-  optOrder=M.map(function(m){return {id:m.id,name:m.name,wasOn:st.compare.indexOf(m.id)>=0}});
-  optOrder.sort(function(a,b){return b.wasOn-a.wasOn});
-  q.value="";pop.hidden=false;comboBtn.setAttribute("aria-expanded","true");renderOpts();q.focus();
+mineBtn.onclick=function(){pq.value="";renderGrid();pick.showModal();pq.focus()};
+pq.oninput=renderGrid;
+pick.addEventListener("click",function(e){if(e.target===pick)pick.close()});
+// comparison: the same overlay, but cards toggle; selected ones sit first, in the order fixed when it opens
+var cmpBtn=document.getElementById("cmpBtn"), cpick=document.getElementById("cpick"), cq=document.getElementById("cq"), cgrid=document.getElementById("cgrid"), cOrder=[];
+function renderCmp(){
+  var term=cq.value.trim().toLowerCase();cgrid.textContent="";
+  var rows=cOrder.filter(function(m){return m.id!==st.mine&&m.name.toLowerCase().indexOf(term)>=0});
+  rows.forEach(function(m){
+    var c=card(m),on=st.compare.indexOf(m.id)>=0;c.setAttribute("aria-pressed",on);
+    if(on){c.style.setProperty("--sel",colorOf(m));var t=document.createElement("i");t.className="tick";t.textContent="✓";c.querySelector("b").appendChild(t)}
+    c.onclick=function(){st.compare=on?st.compare.filter(function(id){return id!==m.id}):st.compare.concat(m.id);renderPicks();draw();renderCmp()};
+    cgrid.appendChild(c);
+  });
+  if(!rows.length)noMatch(cgrid);
 }
-function closeCombo(){pop.hidden=true;comboBtn.setAttribute("aria-expanded","false")}
-comboBtn.onclick=function(){pop.hidden?openCombo():closeCombo()};
-q.oninput=renderOpts;
-document.addEventListener("mousedown",function(e){if(!pop.hidden&&!combo.contains(e.target))closeCombo()});
-combo.addEventListener("keydown",function(e){if(e.key==="Escape"&&!pop.hidden){closeCombo();comboBtn.focus()}});
-M.forEach(function(m){var o=document.createElement("option");o.value=m.id;o.textContent=m.name;mineSel.appendChild(o)});
-mineSel.value=st.mine;
-mineSel.onchange=function(){st.mine=mineSel.value;renderPicks();draw()};
+cmpBtn.onclick=function(){
+  cOrder=M.slice().sort(function(a,b){return (st.compare.indexOf(b.id)>=0)-(st.compare.indexOf(a.id)>=0)});
+  cq.value="";renderCmp();cpick.showModal();cq.focus();
+};
+cq.oninput=renderCmp;
+document.getElementById("cdone").onclick=function(){cpick.close()};
+cpick.addEventListener("click",function(e){if(e.target===cpick)cpick.close()});
+showMine();
 renderPicks();
 function draw(){panels.forEach(function(pn){svg=pn.front;drawFront(pn.m,pn.key);drawIso(pn)})}
 var pos=document.getElementById("pos");
