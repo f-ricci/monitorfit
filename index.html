@@ -445,6 +445,8 @@ function demo(){
     botD.h(-v[6]/2,v[6]/2,40,v[6],true);
     leftD.v(-R-30,mt+v[7],mt,v[7],true);
   }
+  // each loop: a 467 ms move, then a still pause of HOLD ms
+  var HOLD=1067;
   var reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
   var ci=Math.floor(Math.random()*DEMO_CMP.length),mi=Math.floor(Math.random()*DEMO_MINE.length),col=Math.floor(Math.random()*PALETTE.length),loop=0;
   var now=DEMO_CMP[ci].concat(DEMO_MINE[mi]);
@@ -457,9 +459,9 @@ function demo(){
     paint();
     (function frame(t){var k=dur?Math.min(1,(t-t0)/dur):1;k=k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2;
       now=from.map(function(a,i){return a+(to[i]-a)*k});set(now);if(k<1&&s.isConnected)requestAnimationFrame(frame)})(t0);
-    setTimeout(step,reduce?4000:2600);
+    setTimeout(step,reduce?4000:HOLD+467);
   }
-  setTimeout(step,reduce?4000:2600);
+  setTimeout(step,reduce?4000:HOLD+467);
   return s;
 }
 // a dimension line with end ticks and its size in mm: h(x1, x2, y, mm, below) or v(x, y1, y2, mm, toLeft)
