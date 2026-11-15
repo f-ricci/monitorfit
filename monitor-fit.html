@@ -14,49 +14,59 @@ body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.45 "JetBrains Mo
 button,input{font:inherit;color:inherit}
 button{border-radius:0}
 main{margin:0;padding:0}
-input[type=range]{width:100%;margin:0;accent-color:var(--accent)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:12px;margin:0;background:transparent;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:2px;background:var(--line)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;height:10px;margin-top:-4px;background:var(--accent);border:0}
+input[type=range]::-moz-range-track{height:2px;background:var(--line)}
+input[type=range]::-moz-range-progress{height:2px;background:var(--accent)}
+input[type=range]::-moz-range-thumb{width:10px;height:10px;background:var(--accent);border:0;border-radius:0}
 input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px;margin:0}
+.blk.sm input[type=checkbox]{width:12px;height:12px}
 svg{display:block;width:100%;height:auto}
 svg.iso polygon.q{cursor:crosshair}
 /* top bar */
-.top{display:flex;flex-wrap:wrap;align-items:stretch;background:var(--card);border-bottom:1px solid var(--line)}
-.top>div{padding:14px 20px;letter-spacing:.06em}
-.top .brand{font-weight:700;font-size:15px;letter-spacing:.08em;border-right:1px solid var(--line)}
-.top .crumb{color:var(--mute);flex:1 1 200px}
-.top .count{border-left:1px solid var(--line)}
+.brand{padding:14px 16px;font-weight:700;font-size:15px;letter-spacing:.08em;border-bottom:1px solid var(--line)}
 /* layout */
 .layout{display:grid;grid-template-columns:300px minmax(0,1fr);align-items:start}
 .content{padding:24px;min-width:0}
 .side{background:var(--card);border-right:1px solid var(--line);position:sticky;top:0;height:100vh;overflow:auto}
-.blk{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.blk{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.blk.sm{font-size:10px;gap:8px}
+.blk.sm .lbl{font-size:9px}
 .blk:last-child{border-bottom:0}
-.lbl{font-size:11px;letter-spacing:.1em;color:var(--mute);text-transform:uppercase}
-.field{display:flex;align-items:center;gap:10px;min-height:44px;padding:0 12px;border:1px solid var(--line);background:var(--card);text-align:left;cursor:pointer;width:100%}
+.lbl{font-size:11px;letter-spacing:.1em;color:var(--mute);text-transform:uppercase;font-weight:700}
+.field{display:flex;align-items:center;gap:10px;min-height:32px;line-height:1;padding:0 12px;border:1px solid var(--line);background:var(--card);text-align:left;cursor:pointer;width:100%}
 .field .nm{flex:1 1 auto}
-.field.dashed{border-style:dashed;border-color:var(--shelfline)}
+.field.dashed{border-style:dashed;border-color:var(--shelfline);gap:8px}
+.field.dashed .hi{margin-left:-2px}
+.field .tx{padding-top:1px}
 .sw{width:12px;height:12px;flex:none}
 .list{display:flex;flex-direction:column;border:1px solid var(--line)}
 .list:empty{display:none}
-.list button{display:flex;align-items:center;gap:10px;min-height:44px;padding:0 12px;border:0;border-bottom:1px solid var(--line);background:var(--card);text-align:left;cursor:pointer}
+.list button{display:flex;align-items:center;gap:10px;min-height:32px;padding:0 12px;border:0;border-bottom:1px solid var(--line);background:var(--card);text-align:left;cursor:pointer}
 .list button:last-child{border-bottom:0}
 .list button .nm{flex:1 1 auto}
 .list button .st{color:var(--mute)}
 .list button[aria-pressed=true]{background:var(--sel-bg);color:var(--sel-ink)}
 .list button[aria-pressed=true] .st{color:var(--sel-ink)}
 .anchors{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border:1px solid var(--line)}
-.anchors button{min-height:44px;border:0;border-bottom:1px solid var(--line);background:var(--card);cursor:pointer}
+.anchors button{min-height:26px;border:0;border-bottom:1px solid var(--line);background:var(--card);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
 .anchors button:nth-child(odd):not([data-p=bc]){border-right:1px solid var(--line)}
 .anchors [data-p=bc]{grid-column:1/-1;border-bottom:0}
 .anchors button[aria-pressed=true],.seg button[aria-pressed=true]{background:var(--sel-bg);color:var(--sel-ink)}
 .seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid var(--line)}
-.seg button{min-height:40px;border:0;border-right:1px solid var(--line);background:var(--card);cursor:pointer}
+.seg button{min-height:24px;border:0;border-right:1px solid var(--line);background:var(--card);cursor:pointer}
 .seg button:last-child{border-right:0}
-.fld{display:flex;flex-direction:column;gap:6px}
+.fld{display:flex;flex-direction:column;gap:4px}
 .fl{display:flex;justify-content:space-between;color:var(--mute);text-transform:uppercase}
 .fl b{color:var(--ink);font-weight:700}
 .fl.sm{font-size:11px;letter-spacing:.06em}
-label.ck{display:flex;align-items:center;gap:10px;min-height:32px;cursor:pointer;text-transform:uppercase}
-.plain{min-height:44px;border:1px solid var(--line);background:var(--card);cursor:pointer;text-transform:uppercase}
+label.ck{display:flex;align-items:center;gap:10px;min-height:20px;cursor:pointer;text-transform:uppercase}
+.plain{min-height:26px;border:1px solid var(--line);background:var(--card);cursor:pointer;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:6px}
+svg.hi{flex:none;display:block}
+svg.hi[width="12"]{width:12px;height:12px}
+svg.hi[width="16"]{width:16px;height:16px}
+svg.hi[width="18"]{width:18px;height:18px}
 /* panels */
 .panel{border:1px solid var(--line);background:var(--card)}
 .panel+.panel{margin-top:24px}
@@ -118,37 +128,33 @@ label.ck{display:flex;align-items:center;gap:10px;min-height:32px;cursor:pointer
 </head>
 <body>
 <main>
-<header class="top">
-  <div class="brand">MONITOR/FIT</div>
-  <div class="crumb">FRONT VIEW + CHAIR VIEW</div>
-  <div class="count" id="cnt"></div>
-</header>
 <div class="layout">
 <aside class="side">
+  <div class="brand">MONITOR/FIT</div>
   <section class="blk">
     <div class="lbl">My monitor</div>
-    <button type="button" class="field" id="mineBtn" aria-haspopup="dialog"><span class="sw"></span><span class="nm"></span><span aria-hidden="true">[+]</span></button>
+    <button type="button" class="field" id="mineBtn" aria-haspopup="dialog"><span class="sw"></span><span class="nm"></span><svg class="hi" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.25 15 12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"></path></svg></button>
   </section>
 
   <section class="blk">
     <div class="lbl">Compare</div>
-    <button type="button" class="field dashed" id="cmpBtn" aria-haspopup="dialog">+ ADD OR REMOVE MONITORS</button>
+    <button type="button" class="field dashed" id="cmpBtn" aria-haspopup="dialog"><svg class="hi" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4.5v15m7.5-7.5h-15"></path></svg><span class="tx">ADD OR REMOVE MONITORS</span></button>
     <div class="list" id="picks"></div>
   </section>
 
-  <section class="blk">
+  <section class="blk sm">
     <div class="lbl">Front view · anchor</div>
     <div class="anchors" id="pos">
-      <button type="button" data-p="tl" aria-pressed="false" aria-label="Top left">┌ TOP L</button>
-      <button type="button" data-p="tr" aria-pressed="false" aria-label="Top right">TOP R ┐</button>
-      <button type="button" data-p="bl" aria-pressed="false" aria-label="Bottom left">└ BOT L</button>
-      <button type="button" data-p="br" aria-pressed="false" aria-label="Bottom right">BOT R ┘</button>
-      <button type="button" data-p="bc" aria-pressed="true" aria-label="Bottom centre">┴ BOTTOM CENTRE</button>
+      <button type="button" data-p="tl" aria-pressed="false" aria-label="Top left"><svg class="hi" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m19.5 19.5-15-15m0 0v11.25m0-11.25h11.25"></path></svg>TOP L</button>
+      <button type="button" data-p="tr" aria-pressed="false" aria-label="Top right">TOP R<svg class="hi" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25"></path></svg></button>
+      <button type="button" data-p="bl" aria-pressed="false" aria-label="Bottom left"><svg class="hi" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m19.5 4.5-15 15m0 0V8.25m0 11.25h11.25"></path></svg>BOT L</button>
+      <button type="button" data-p="br" aria-pressed="false" aria-label="Bottom right">BOT R<svg class="hi" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4.5 4.5 15 15m0 0V8.25m0 11.25H8.25"></path></svg></button>
+      <button type="button" data-p="bc" aria-pressed="true" aria-label="Bottom centre"><svg class="hi" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"></path></svg>BOTTOM CENTRE</button>
     </div>
     <label class="ck"><input type="checkbox" id="ghost" checked> Show my monitor</label>
   </section>
 
-  <section class="blk">
+  <section class="blk sm">
     <div class="lbl">Chair view</div>
     <div class="fld"><span class="fl">Desk depth · cm</span>
       <div class="seg" id="depth">
@@ -166,7 +172,7 @@ label.ck{display:flex;align-items:center;gap:10px;min-height:32px;cursor:pointer
       <label class="fl sm" for="gy">Left / right</label><input type="range" id="gy" min="-70" max="70" step="1" value="0">
       <label class="fl sm" for="gp">Up / down</label><input type="range" id="gp" min="-45" max="25" step="1" value="0">
     </div>
-    <button type="button" class="plain" id="gc">↺ Gaze back to centre</button>
+    <button type="button" class="plain" id="gc"><svg class="hi" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"></path></svg>Gaze back to centre</button>
   </section>
 </aside>
 <div class="content">
@@ -187,7 +193,7 @@ label.ck{display:flex;align-items:center;gap:10px;min-height:32px;cursor:pointer
   <div class="dlg">
     <div class="dhead">
       <div class="dt">MY MONITOR</div>
-      <label class="dsearch"><svg width="16" height="16" viewBox="0 0 16 16" style="width:16px;flex:none" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.5"></circle><path d="M11 11 L15 15" stroke="currentColor" stroke-width="1.5"></path></svg><input type="search" id="pq" placeholder="Search monitors, sizes, resolutions" aria-label="Search monitors" autocomplete="off"><span class="kbd">ESC</span></label>
+      <label class="dsearch"><svg class="hi" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"></path></svg><input type="search" id="pq" placeholder="Search monitors, sizes, resolutions" aria-label="Search monitors" autocomplete="off"><span class="kbd">ESC</span></label>
     </div>
     <div class="dfilter" id="pfilter"></div>
     <div class="grid" id="pgrid"></div>
@@ -201,7 +207,7 @@ label.ck{display:flex;align-items:center;gap:10px;min-height:32px;cursor:pointer
   <div class="dlg">
     <div class="dhead">
       <div class="dt">COMPARE</div>
-      <label class="dsearch"><svg width="16" height="16" viewBox="0 0 16 16" style="width:16px;flex:none" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.5"></circle><path d="M11 11 L15 15" stroke="currentColor" stroke-width="1.5"></path></svg><input type="search" id="cq" placeholder="Search monitors, sizes, resolutions" aria-label="Search monitors" autocomplete="off"><span class="kbd">ESC</span></label>
+      <label class="dsearch"><svg class="hi" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"></path></svg><input type="search" id="cq" placeholder="Search monitors, sizes, resolutions" aria-label="Search monitors" autocomplete="off"><span class="kbd">ESC</span></label>
       <div class="dcount" id="ccount"></div>
     </div>
     <div class="dfilter" id="cfilter"></div>
@@ -317,7 +323,6 @@ function renderPicks(){
     b.onclick=function(){st.show=on?st.show.filter(function(id){return id!==m.id}):st.show.concat(m.id);renderPicks();draw()};
     picks.appendChild(b);
   });
-  document.getElementById("cnt").textContent=st.show.length+" COMPARED";
   renderPanels();
 }
 function signed(mm){return mm===0?"same":(mm>0?"+":"−")+cm(Math.abs(mm))}
@@ -370,9 +375,13 @@ function card(m,on,withMine){
   var meta=document.createElement("span");meta.className="meta";
   meta.appendChild(document.createTextNode((m.bw/10).toFixed(1)+" × "+(m.bh/10).toFixed(1)+" CM"));meta.appendChild(document.createElement("br"));
   meta.appendChild(document.createTextNode(m.res+" · "+(m.R?m.curve:"FLAT")));c.appendChild(meta);
-  var ind=document.createElement("span");ind.className="ind";ind.setAttribute("aria-hidden","true");ind.textContent=on?"✓":"+";c.appendChild(ind);
+  var ind=document.createElement("span");ind.className="ind";ind.setAttribute("aria-hidden","true");ind.appendChild(icon(on?"m4.5 12.75 6 6 9-13.5":"M12 4.5v15m7.5-7.5h-15",16,on?2:1.5));c.appendChild(ind);
   return c;
 }
+// a Heroicons outline icon from its path data
+function icon(d,size,sw){var s=document.createElementNS(NS,"svg");
+  [["width",size],["height",size],["viewBox","0 0 24 24"],["fill","none"],["stroke","currentColor"],["stroke-width",sw],["stroke-linecap","round"],["stroke-linejoin","round"],["class","hi"]].forEach(function(a){s.setAttribute(a[0],a[1])});
+  el("path",{d:d},s);return s}
 function noMatch(g){var n=document.createElement("div");n.className="none";n.textContent="No monitors match";g.appendChild(n)}
 function renderGrid(){
   var term=pq.value.trim().toLowerCase();pgrid.textContent="";
