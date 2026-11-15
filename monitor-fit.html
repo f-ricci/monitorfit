@@ -403,7 +403,8 @@ function renderCmp(){
   var rows=cOrder.filter(function(m){return m.id!==st.mine&&matches(m,term,flt.c)});
   rows.forEach(function(m){
     var on=st.compare.indexOf(m.id)>=0,c=card(m,on,true);c.setAttribute("aria-pressed",on);
-    c.onclick=function(){st.compare=on?st.compare.filter(function(id){return id!==m.id}):st.compare.concat(m.id);renderPicks();draw();renderCmp()};
+    // read the list at click time, so a click never adds a monitor twice
+    c.onclick=function(){var was=st.compare.indexOf(m.id)>=0;st.compare=st.compare.filter(function(id){return id!==m.id});if(!was)st.compare.push(m.id);renderCmp();renderPicks();draw()};
     cgrid.appendChild(c);
   });
   if(!rows.length)noMatch(cgrid);
