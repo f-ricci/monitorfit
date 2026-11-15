@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Import Tracker</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  /* Follows .cache/icecat/bulk-run.log (written by tools/icecat-import.js) through the local server. */
+  :root { --bg:#f6f7f9; --ink:#15171c; --muted:#6b7280; --accent:#C2459B; --track:#e4e7ec; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#111317; --ink:#e7e9ee; --muted:#8b93a1; --track:#2b2f37; } }
+  :root[data-theme="dark"] { --bg:#111317; --ink:#e7e9ee; --muted:#8b93a1; --track:#2b2f37; }
+  body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center; background:var(--bg); color:var(--ink); font:12px/1.5 "JetBrains Mono", ui-monospace, monospace; }
+  main { width:100%; max-width:640px; padding:0 16px; }
+  .bar { height:12px; background:var(--track); }
+  .bar > div { height:100%; width:0; background:var(--accent); transition:width .6s; }
+  p { margin:8px 0 0; color:var(--muted); font-variant-numeric:tabular-nums; }
+</style>
+</head>
+<body>
+<main>
+  <div class="bar"><div id="fill"></div></div>
+  <p id="text">waiting for the log</p>
+</main>
+<script>
+var LOG = "../.cache/icecat/bulk-run.log";
+function render(t) {
+  var total = +((t.match(/^(\d+) products to look up/m) || [])[1] || 0);
+  var done = 0, m, re = /^\s+(\d+)\/\d+ fetched/gm;
+  while ((m = re.exec(t))) done = +m[1];
+  var exit = t.match(/^exit (\d+)/m);
+  if (exit) done = total;
+  document.getElementById("fill").style.width = (total ? 100 * done / total : 0) + "%";
+  document.getElementById("text").textContent = total
+    ? done.toLocaleString() + " / " + total.toLocaleString() + (exit ? (exit[1] === "0" ? " · finished" : " · stopped") : "")
+    : "starting";
+  return !!exit;
+}
+function poll() {
+  fetch(LOG + "?t=" + Date.now(), { cache: "no-store" })
+    .then(function (r) { if (!r.ok) throw 0; return r.text(); })
+    .then(function (t) { if (!render(t)) setTimeout(poll, 2000); })
+    .catch(function () { setTimeout(poll, 3000); });
+}
+poll();
+</script>
+</body>
+</html>

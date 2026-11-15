@@ -36,6 +36,11 @@ svg.iso polygon.q{cursor:crosshair}
 .blk.sm{font-size:10px;gap:8px}
 .blk.sm .lbl{font-size:9px}
 .blk:last-child{border-bottom:0}
+.side{display:flex;flex-direction:column}
+.side>*{flex:none}
+.credit{margin-top:auto;padding:12px 16px;font-size:10px;color:var(--mute)}
+.credit b{font-size:10px;font-weight:500;color:var(--ink)}
+.credit a{color:inherit}
 .lbl{font-size:11px;letter-spacing:.1em;color:var(--mute);text-transform:uppercase;font-weight:700}
 .field{display:flex;align-items:center;gap:10px;min-height:32px;line-height:1;padding:0 12px;border:1px solid var(--line);background:var(--card);text-align:left;cursor:pointer;width:100%}
 .field .nm{flex:1 1 auto}
@@ -117,6 +122,7 @@ svg.hi[width="18"]{width:18px;height:18px}
 .card .pv svg{height:88px}
 .card b{font-size:14px}
 .card .meta{color:var(--mute);padding-right:36px}
+.grid .more{grid-column:1/-1;height:1px}
 .card .ind{position:absolute;right:12px;bottom:12px;width:28px;height:28px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--mute);font-size:16px}
 .card.on .ind{border-color:var(--sel);color:var(--ink);font-size:14px}
 .grid .none{grid-column:1/-1;color:var(--mute);text-align:center;padding:24px}
@@ -176,6 +182,9 @@ svg.hi[width="18"]{width:18px;height:18px}
     </div>
     <button type="button" class="plain" id="gc"><svg class="hi" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"></path></svg>Gaze back to centre</button>
   </section>
+  <footer class="credit">
+    <span><b>Data by <a href="https://icecat.biz/" target="_blank" rel="noopener">Icecat</a></b> · <a href="data.html">About the data</a></span>
+  </footer>
 </aside>
 <div class="content">
 
@@ -227,8 +236,10 @@ svg.hi[width="18"]{width:18px;height:18px}
 <script src="monitor-model.js"></script>
 <script src="monitors-data.js"></script>
 <script>
-// monitors come from the catalogue (monitors-data.js), flattened to what the drawing needs
-var M=MONITORS.map(toDrawing).filter(Boolean);
+// monitors come from the catalogue (monitors-data.js), flattened to what the drawing needs;
+// the full list (catalogue/index.json) replaces them once it has loaded
+var M=MONITORS.map(toDrawing).filter(Boolean), MI={};
+function indexM(){MI={};M.forEach(function(m){MI[m.id]=m;m.hay=(m.name+" "+cm(m.bw)+" "+cm(m.bh)+" "+m.res+" "+m.curve+(m.diag?" "+m.diag+'"':"")).toLowerCase()})}
 var LIFT=92;
 // my monitor keeps one colour; compared monitors draw from a palette of 30 distinct colours (Glasbey)
 var MINE_COLOR="#C2459B", PALETTE=["#d60000","#8c3bff","#018700","#00acc6","#97ff00","#ff7ed1","#6b004f","#ffa52f","#573b00","#005659","#0000dd","#00fdcf","#a17569","#bcb6ff","#95b577","#002e6b","#645474","#790000","#0774d8","#fdf490","#004b00","#8e7900","#ff7266","#edb8b8","#5d7e66","#9ae4ff","#eb0077","#a57bb8","#5900a3","#03c600"];
@@ -238,7 +249,7 @@ function el(t,a,p){var e=document.createElementNS(NS,t);for(var k in a)e.setAttr
 function tx(x,y,s,a){var e=el("text",Object.assign({x:x,y:y,"font-size":22,fill:"var(--mute)","font-family":"inherit"},a||{}));e.textContent=s;return e}
 function mmL(v){return Math.round(v)+" MM"}
 function cm(mm){return (Math.round(mm/10*10)/10).toFixed(1).replace(/\.0$/,"")+" cm"}
-function byId(id){return M.filter(function(m){return m.id===id})[0]}
+function byId(id){return MI[id]}
 function mine(){return byId(st.mine)}
 function colorOf(m){return m.id===st.mine?MINE_COLOR:st.colors[m.id]||"var(--line)"}
 // give each compared monitor a random palette colour no other compared monitor has
@@ -345,8 +356,7 @@ var cmpBtn=document.getElementById("cmpBtn"), cpick=document.getElementById("cpi
 var FILTERS=[["all","All"],["flat","Flat"],["curved","Curved"],["u80","Under 80 cm"]], flt={p:"all",c:"all"};
 function showMine(){mineBtn.querySelector(".sw").style.background=MINE_COLOR;mineBtn.querySelector(".nm").textContent=mine().name}
 function matches(m,term,f){
-  var hay=(m.name+" "+cm(m.bw)+" "+cm(m.bh)+" "+m.res+" "+m.curve).toLowerCase();
-  if(term&&hay.indexOf(term)<0)return false;
+  if(term&&m.hay.indexOf(term)<0)return false;
   return f==="flat"?!m.R:f==="curved"?!!m.R:f==="u80"?m.bw<800:true;
 }
 function filterBar(box,k,render){
@@ -380,31 +390,43 @@ function icon(d,size,sw){var s=document.createElementNS(NS,"svg");
   [["width",size],["height",size],["viewBox","0 0 24 24"],["fill","none"],["stroke","currentColor"],["stroke-width",sw],["stroke-linecap","round"],["stroke-linejoin","round"],["class","hi"]].forEach(function(a){s.setAttribute(a[0],a[1])});
   el("path",{d:d},s);return s}
 function noMatch(g){var n=document.createElement("div");n.className="none";n.textContent="No monitors match";g.appendChild(n)}
+// thousands of monitors: cards are added a page at a time as the grid scrolls near its end
+var PAGE=48;
+function pageInto(g,rows,make){
+  if(g._io)g._io.disconnect();
+  g.textContent="";g.scrollTop=0;
+  if(!rows.length){noMatch(g);return}
+  var n=0,sent=document.createElement("div");sent.className="more";
+  var io=g._io=new IntersectionObserver(function(es){if(es[0].isIntersecting)more()},{root:g,rootMargin:"600px"});
+  function more(){io.unobserve(sent);sent.remove();rows.slice(n,n+PAGE).forEach(function(m){g.appendChild(make(m))});n+=PAGE;if(n<rows.length){g.appendChild(sent);io.observe(sent)}}
+  more();
+}
 function renderGrid(){
-  var term=pq.value.trim().toLowerCase();pgrid.textContent="";
-  var rows=M.filter(function(m){return matches(m,term,flt.p)});
-  rows.forEach(function(m){
+  var term=pq.value.trim().toLowerCase();
+  pageInto(pgrid,M.filter(function(m){return matches(m,term,flt.p)}),function(m){
     var cur=m.id===st.mine,c=card(m,cur,!cur);c.setAttribute("aria-current",cur);
     c.onclick=function(){st.mine=m.id;st.show=st.show.filter(function(id){return id!==m.id});pick.close();showMine();renderPicks();draw()};
-    pgrid.appendChild(c);
+    return c;
   });
-  if(!rows.length)noMatch(pgrid);
 }
 mineBtn.onclick=function(){pq.value="";flt.p="all";filterBar(pfilter,"p",renderGrid);renderGrid();pick.showModal();pq.focus()};
 pq.oninput=renderGrid;
 document.getElementById("pdone").onclick=function(){pick.close()};
 pick.addEventListener("click",function(e){if(e.target===pick)pick.close()});
 // comparison: cards toggle; selected ones sit first, in the order fixed when it opens
+function cmpCard(m){
+  var on=st.compare.indexOf(m.id)>=0,c=card(m,on,true);c.setAttribute("aria-pressed",on);
+  // read the list at click time, so a click never adds a monitor twice; the card is swapped in place, so the grid keeps its scroll
+  c.onclick=function(){var was=st.compare.indexOf(m.id)>=0;st.compare=st.compare.filter(function(id){return id!==m.id});if(!was)st.compare.push(m.id);
+    renderPicks();c.replaceWith(cmpCard(m));cmpCount();draw()};
+  return c;
+}
 function renderCmp(){
-  var term=cq.value.trim().toLowerCase();cgrid.textContent="";
-  var rows=cOrder.filter(function(m){return m.id!==st.mine&&matches(m,term,flt.c)});
-  rows.forEach(function(m){
-    var on=st.compare.indexOf(m.id)>=0,c=card(m,on,true);c.setAttribute("aria-pressed",on);
-    // read the list at click time, so a click never adds a monitor twice
-    c.onclick=function(){var was=st.compare.indexOf(m.id)>=0;st.compare=st.compare.filter(function(id){return id!==m.id});if(!was)st.compare.push(m.id);renderCmp();renderPicks();draw()};
-    cgrid.appendChild(c);
-  });
-  if(!rows.length)noMatch(cgrid);
+  var term=cq.value.trim().toLowerCase();
+  pageInto(cgrid,cOrder.filter(function(m){return m.id!==st.mine&&matches(m,term,flt.c)}),cmpCard);
+  cmpCount();
+}
+function cmpCount(){
   var cc=document.getElementById("ccount"),n=st.compare.filter(function(id){return id!==st.mine}).length;
   cc.textContent="";var b=document.createElement("b");b.textContent=n;cc.appendChild(b);cc.appendChild(document.createTextNode(" SELECTED"));
 }
@@ -415,8 +437,18 @@ cmpBtn.onclick=function(){
 cq.oninput=renderCmp;
 document.getElementById("cdone").onclick=function(){cpick.close()};
 cpick.addEventListener("click",function(e){if(e.target===cpick)cpick.close()});
+indexM();
 showMine();
 renderPicks();
+// swap in the full catalogue; opened from disk (file://) the fetch fails and the built-in monitors stay
+fetch("catalogue/index.json").then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(cat){
+  // a row's id follows its fields when it isn't the slug of the name
+  var f=cat.fields,full=cat.rows.map(function(row){var m={};f.forEach(function(k,i){m[k]=row[i]});
+    m.id=row[f.length]||m.name.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+    m.curve=m.R?m.R+"R":"flat";m.res=m.res.replace("x"," × ");return m});
+  if(!full.some(function(m){return m.id===st.mine}))return;
+  M=full;indexM();showMine();renderPicks();draw();
+}).catch(function(){});
 function draw(){panels.forEach(function(pn){svg=pn.front;drawFront(pn.m,pn.key);drawIso(pn)});syncGaze()}
 var pos=document.getElementById("pos");
 [].forEach.call(pos.children,function(b){b.onclick=function(){st.pos=b.dataset.p;[].forEach.call(pos.children,function(c){c.setAttribute("aria-pressed",c===b)});draw()}});

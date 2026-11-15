@@ -88,13 +88,39 @@
  * @property {Object<string, Provenance>} [provenance] keyed by dotted field path, e.g. "dimensions.bodyMm"
  */
 
+/** @typedef {"automated"|"manual"|"ask"} CollectionPolicy automated = robots.txt and terms allow polite crawling; manual = enter by hand only; ask = unclear, check with the user first */
+
+/**
+ * @typedef {Object} RobotsRule
+ * @property {string} host
+ * @property {"allowed"|"partly"|"disallowed"|"unverified"} specPaths whether the monitor spec paths may be fetched by a generic user agent
+ * @property {number} [crawlDelayS]
+ * @property {string} [note] the relevant lines, quoted short
+ */
+
+/**
+ * @typedef {Object} Terms
+ * @property {string} url
+ * @property {"allowed"|"forbidden"|"unclear"|"unverified"} automatedAccess
+ * @property {string} reuse e.g. "personal, non-commercial only"
+ * @property {string} [note]
+ */
+
 /**
  * @typedef {Object} Brand
  * @property {string} id e.g. "dell"
  * @property {string} name
+ * @property {string} [specSource] the official spec source, e.g. "PSREF", "QuickSpecs"
+ * @property {string} [specSourceUrl]
  * @property {string} [catalogueUrl]
- * @property {string} [supportUrl]
- * @property {boolean} [inIcecat]
+ * @property {string[]} [exampleUrls] one or two real spec pages or PDFs
+ * @property {string} [supportUrl] support / archive for older models
+ * @property {RobotsRule[]} [robots]
+ * @property {Terms} [terms]
+ * @property {boolean} [inIcecat] absent = unknown
+ * @property {number} [icecatSupplierId] the brand's Supplier_id in Icecat's index files
+ * @property {CollectionPolicy} [collection]
+ * @property {string} [checked] ISO date the robots.txt and terms were last read
  */
 
 var STATUSES = ["current", "discontinued", "announced"];

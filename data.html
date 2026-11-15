@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>About the data</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f7f9;--ink:#1b1f24;--mute:#5b6470;--line:#d9dde3;--card:#fff;--accent:#2563eb}
+@media (prefers-color-scheme:dark){:root{--bg:#111418;--ink:#e6e9ee;--mute:#9aa3ae;--line:#2c323a;--card:#181c21;--accent:#5b8cff}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.6 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+main{max-width:720px;margin:0 auto;padding:24px 16px 48px}
+.brand{font-weight:700;font-size:15px;letter-spacing:.08em;margin-bottom:24px;display:flex;justify-content:space-between;align-items:baseline;gap:16px}
+.brand a{font-size:11px;font-weight:500;letter-spacing:0;color:var(--accent);text-decoration:none}
+.brand a:hover{text-decoration:underline}
+h1{font-size:18px;font-weight:700;margin:0 0 8px}
+section{background:var(--card);border:1px solid var(--line);padding:16px;margin-top:12px}
+h2{font-size:11px;letter-spacing:.1em;color:var(--mute);text-transform:uppercase;font-weight:700;margin:0 0 8px}
+p{margin:0 0 8px}p:last-child{margin:0}
+ul{margin:0;padding-left:18px}li{margin:2px 0}
+a{color:var(--accent)}
+.notice{font-weight:500}
+.mute{color:var(--mute)}
+</style>
+</head>
+<body>
+<main>
+  <div class="brand">MONITOR/FIT <a href="monitor-fit.html">← Back to the tool</a></div>
+  <h1>About the data</h1>
+  <p class="mute">Monitor specifications come from Open Icecat, a free product-data catalogue fed by the manufacturers.</p>
+
+  <section>
+    <h2>Copyright</h2>
+    <p class="notice">Database Right data-sheet 2026 Icecat. All rights reserved.</p>
+    <p>Data by <a href="https://icecat.biz/" target="_blank" rel="noopener">Icecat</a>, used under the <a href="https://iceclog.com/open-content-license/" target="_blank" rel="noopener">Open Icecat Open Content License</a>.</p>
+  </section>
+
+  <section>
+    <h2>No warranty</h2>
+    <p>The data is provided "as is", without warranty of any kind, either expressed or implied. Sizes can be wrong or out of date; check the manufacturer's specifications before you buy.</p>
+  </section>
+
+  <section>
+    <h2>What we changed</h2>
+    <ul>
+      <li>Kept only the fields the tool uses: screen, body and stand sizes, curve, panel, ergonomics, ports, power and weight.</li>
+      <li>Converted sizes to whole millimetres and weights to kilograms.</li>
+      <li>Where Icecat lists no screen area, worked it out from the diagonal and resolution; those values are marked "estimated".</li>
+      <li>Merged regional variants of the same model into one entry.</li>
+      <li>A few monitors were entered by hand and are not from Icecat.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Licence conditions</h2>
+    <p>The full terms are in the <a href="https://iceclog.com/open-content-license/" target="_blank" rel="noopener">Open Content License</a>. In short:</p>
+    <ul>
+      <li>The data and anything built from it must stay free of charge.</li>
+      <li>It may not be used to train machine-learning models.</li>
+      <li>Anyone passing it on must keep these notices and the licence with it.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Coverage</h2>
+    <p>Fetched on 15 November 2026: monitors on the market from Acer, Alienware, AOC, ASUS, BenQ, Dell, EIZO, GIGABYTE, HP, iiyama, Lenovo, LG, MSI, Philips, Samsung and ViewSonic.</p>
+  </section>
+</main>
+</body>
+</html>
