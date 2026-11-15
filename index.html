@@ -95,6 +95,9 @@ svg.hi[width="18"]{width:18px;height:18px}
 .hl{font-size:11px;letter-spacing:.1em;color:var(--mute)}
 #panels.multi .half{height:auto}
 #panels.multi .half svg{flex:none;height:auto}
+.above{border-top:1px solid var(--line);padding:16px;display:flex;flex-direction:column;gap:8px}
+.above[hidden]{display:none}
+.above svg{display:block;margin:0 auto;max-width:100%;height:auto}
 .foot{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line);font-size:12px}
 .foot>*{padding:10px 14px;display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center;text-transform:uppercase}
 .foot>.legend{border-left:1px solid var(--line);color:var(--mute)}
@@ -203,6 +206,7 @@ svg.hi[width="18"]{width:18px;height:18px}
     <div class="half"><div class="hl">FRONT</div><svg class="front" role="img"></svg></div>
     <div class="half"><div class="hl">CHAIR</div><svg class="iso" role="img"></svg></div>
   </div>
+  <div class="above" hidden><div class="hl">FROM ABOVE</div><svg class="top" role="img"></svg></div>
   <div class="foot"><div class="key"></div><div class="legend"><span><i class="lg a"></i>≤15° focus</span><span><i class="lg b"></i>15–30° eyes</span><span><i class="lg c"></i>&gt;30° head</span><span>Click or drag on the screen to look there</span></div></div>
 </article>
 </template>
@@ -300,6 +304,31 @@ function monitor(m,x,b,ghost){
   var side=(m.bw-m.pw)/2;
   el("rect",{x:x+side,y:y+side,width:m.pw,height:m.ph,fill:colorOf(m),"fill-opacity":.35,stroke:colorOf(m),"stroke-width":3},g);
 }
+// curvature seen from above, in its own row under both halves and lined up with the front view: the deepest points
+// (screen centres) sit on one line, so the edges show how far each screen wraps; the compared monitor in colour,
+// mine dashed on top. Shown only when one of the two is curved.
+function sag(m){return m.R?m.R-Math.sqrt(m.R*m.R-m.bw*m.bw/4):0}
+function drawTop(pn){
+  var m=pn.m,y=mine(),show=st.ghost&&y&&m.id!==st.mine&&(m.R||y.R);
+  pn.above.hidden=!show;svg=pn.top;svg.textContent="";if(!show)return;
+  var x=left(m),yl=-y.bw/2,s=Math.max(sag(m),sag(y));
+  function arc(mon,x0,at){var e=sag(mon);
+    el("path",Object.assign({d:"M"+x0+","+e+(mon.R?" A"+mon.R+" "+mon.R+" 0 0 1 ":" L")+(x0+mon.bw)+","+e,fill:"none","stroke-linecap":"round"},at))}
+  arc(m,x,{stroke:colorOf(m),"stroke-width":6});
+  arc(y,yl,{stroke:colorOf(y),"stroke-width":3,"stroke-dasharray":"12 9"});
+  function label(mon){return mon.R?mon.R+"R · "+mmL(sag(mon))+" DEEP":"FLAT"}
+  // compared label right, mine left, like the front view's dimensions
+  tx(x+m.bw,s+40,label(m),{"text-anchor":"end",fill:"var(--ink)","font-weight":700,"font-size":24});
+  tx(yl,s+(x+m.bw-yl<650?76:40),label(y),{fill:"var(--mine-ink)","font-weight":700,"font-size":24});
+  fit(svg,30);sizeTop(pn);
+}
+// draw the top view at the front view's scale, so millimetres and text match the drawing above it
+function sizeTop(pn){
+  if(pn.above.hidden)return;
+  var fv=pn.front.viewBox.baseVal,r=pn.front.getBoundingClientRect(),k=Math.min(r.width/fv.width,r.height/fv.height);
+  pn.top.style.width=Math.round(pn.top.viewBox.baseVal.width*k)+"px";
+}
+addEventListener("resize",function(){panels.forEach(sizeTop)});
 // crop the drawing to what was drawn, so it fills its half of the panel
 function fit(s,pad){var b=s.getBBox();s.setAttribute("viewBox",[b.x-pad,b.y-pad,b.width+2*pad,b.height+2*pad].map(Math.round).join(" "))}
 function drawFront(m,key){
@@ -442,7 +471,8 @@ function renderPanels(){
     n.querySelector(".pdiff").textContent=headline(m,y);
     f.setAttribute("aria-label","Front view of "+m.name+" with its dimensions");
     is.setAttribute("aria-label","Axonometric view of the desk with "+m.name+", from the chair");
-    return {m:m,front:f,iso:is,key:n.querySelector(".key")};
+    n.querySelector(".top").setAttribute("aria-label","Curvature of "+m.name+" and your monitor, seen from above");
+    return {m:m,front:f,iso:is,top:n.querySelector(".top"),above:n.querySelector(".above"),key:n.querySelector(".key")};
   });
 }
 // pickers: an overlay with search, filters and a 4-column grid of cards; each card previews its monitor against yours
@@ -621,7 +651,7 @@ fetch("catalogue/index.json").then(function(r){if(!r.ok)throw new Error(r.status
     m.curve=m.R?m.R+"R":"flat";m.res=m.res.replace("x"," × ");return m});
   M=full;indexM();
 }).catch(function(){}).then(restore);
-function draw(){panels.forEach(function(pn){svg=pn.front;drawFront(pn.m,pn.key);drawIso(pn)});syncGaze()}
+function draw(){panels.forEach(function(pn){svg=pn.front;drawFront(pn.m,pn.key);drawTop(pn);drawIso(pn)});syncGaze()}
 var pos=document.getElementById("pos");
 [].forEach.call(pos.children,function(b){b.onclick=function(){st.pos=b.dataset.p;[].forEach.call(pos.children,function(c){c.setAttribute("aria-pressed",c===b)});draw()}});
 document.getElementById("ghost").onchange=function(e){st.ghost=e.target.checked;draw()};
