@@ -52,6 +52,7 @@ svg.iso polygon.q{cursor:crosshair}
 .field.unset .nm{color:var(--mute)}
 .empty{border:1px dashed var(--shelfline);background:var(--card);padding:48px 24px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
 .empty b{font-size:15px}
+.empty .demo{width:100%;max-width:560px;height:auto;margin-bottom:12px}
 .empty span{color:var(--mute)}
 .empty .field{width:auto;margin-top:8px}
 .list{display:flex;flex-direction:column;border:1px solid var(--line)}
@@ -245,7 +246,9 @@ svg.hi[width="18"]{width:18px;height:18px}
 // monitors come from the catalogue (monitors-data.js), flattened to what the drawing needs;
 // the full list (catalogue/index.json) replaces them once it has loaded
 var M=MONITORS.map(toDrawing).filter(Boolean), MI={};
-function indexM(){MI={};M.forEach(function(m){MI[m.id]=m;m.hay=(m.name+" "+cm(m.bw)+" "+cm(m.bh)+" "+m.res+" "+m.curve+(m.diag?" "+m.diag+'"':"")).toLowerCase()})}
+function indexM(){MI={};M.forEach(function(m){MI[m.id]=m;m.hay=squash(m.name+" "+cm(m.bw)+" "+cm(m.bh)+" "+m.res+" "+m.curve+(m.R?" curved":"")+(m.diag?" "+m.diag:""))})}
+// search text without case, spaces or punctuation, so "ultra sharp", "u2724-d" and "3440 × 1440" all line up
+function squash(t){return String(t).toLowerCase().replace(/×/g,"x").replace(/[^a-z0-9.]/g,"")}
 var LIFT=92;
 // my monitor keeps one colour; compared monitors draw from a palette of 30 distinct colours (Glasbey)
 var MINE_COLOR="#C2459B", PALETTE=["#d60000","#8c3bff","#018700","#00acc6","#97ff00","#ff7ed1","#6b004f","#ffa52f","#573b00","#005659","#0000dd","#00fdcf","#a17569","#bcb6ff","#95b577","#002e6b","#645474","#790000","#0774d8","#fdf490","#004b00","#8e7900","#ff7266","#edb8b8","#5d7e66","#9ae4ff","#eb0077","#a57bb8","#5900a3","#03c600"];
@@ -341,9 +344,69 @@ function renderPicks(){
   });
   renderPanels();
 }
+// sizes for the empty-state animation, picked from the catalogue: [body w, body h, screen w, screen h] in mm.
+// The commonest real sizes, each at least 28 mm (width/height distance) from every other one in both lists
+var DEMO_CMP=[[465,361,432,324],[487,290,476,268],[504,349,474,296],[507,311,477,268],[532,351,518,324],[559,381,518,324],[560,348,521,293],[612,393,597,336],[640,369,621,341],[646,398,598,336],
+  [687,447,641,401],[690,476,653,435],[692,405,646,403],[703,322,690,291],[714,455,698,393],[730,398,698,393],[741,441,709,399],[793,452,773,419],[810,395,797,334],[816,483,808,455],
+  [835,382,819,346],[861,522,841,473],[895,399,880,367],[907,529,885,498],[932,551,920,517],[947,447,929,392],[973,566,941,529],[1057,361,1052,329],[1194,369,1193,336],[1223,529,1207,503]];
+// yours: 23.8", 27", 31.5", 34" and 40" ultrawides
+var DEMO_MINE=[[540,323,526,296],[611,363,598,336],[716,426,697,392],[812,366,800,337],[947,419,929,392]];
+// a random index other than the current one
+function another(n,cur){var i=Math.floor(Math.random()*(n-1));return i>=cur?i+1:i}
+// the front view, looping: one compared monitor over one of yours, both to scale; a new compared monitor every loop,
+// a new one of yours every third loop
+function demo(){
+  var s=document.createElementNS(NS,"svg");s.setAttribute("viewBox","-860 -770 1720 880");s.setAttribute("class","demo");s.setAttribute("aria-hidden","true");
+  var foot=el("rect",{x:-130,y:-10,width:260,height:10,fill:"var(--bezel)"},s),neck=el("rect",{x:-30,width:60,fill:"var(--bezel)"},s),
+    body=el("rect",{fill:"var(--bezel)"},s),scr=el("rect",{"fill-opacity":.35,"stroke-width":3},s),
+    ghost=el("rect",{fill:"none",stroke:MINE_COLOR,"stroke-width":3,"stroke-dasharray":"12 9"},s),
+    // the compared monitor measured on top and right, yours on the bottom and left, as in the front view
+    topD=demoDim(s,"var(--ink)","var(--ink)"),rightD=demoDim(s,"var(--ink)","var(--ink)"),
+    botD=demoDim(s,MINE_COLOR,"var(--mine-ink)"),leftD=demoDim(s,MINE_COLOR,"var(--mine-ink)");
+  function set(v){
+    var y=-(LIFT+v[1]),gi=(v[4]-v[6])/2;
+    [["x",-v[0]/2],["y",y],["width",v[0]],["height",v[1]]].forEach(function(a){body.setAttribute(a[0],a[1])});
+    [["x",-v[2]/2],["y",y+(v[0]-v[2])/2],["width",v[2]],["height",v[3]]].forEach(function(a){scr.setAttribute(a[0],a[1])});
+    neck.setAttribute("y",-(LIFT+v[1]*0.55));neck.setAttribute("height",LIFT+v[1]*0.55-6);
+    [["x",-v[4]/2+gi],["y",-(LIFT+v[5])+gi],["width",v[6]],["height",v[7]]].forEach(function(a){ghost.setAttribute(a[0],a[1])});
+    var top=-(LIFT+Math.max(v[1],v[5])),R=Math.max(v[0],v[4])/2,mt=-(LIFT+v[5])+gi;
+    topD.h(-v[0]/2,v[0]/2,top-40,v[0]);
+    rightD.v(R+30,-LIFT,-(LIFT+v[1]),v[1],false);
+    botD.h(-v[6]/2,v[6]/2,40,v[6],true);
+    leftD.v(-R-30,mt+v[7],mt,v[7],true);
+  }
+  var reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var ci=Math.floor(Math.random()*DEMO_CMP.length),mi=Math.floor(Math.random()*DEMO_MINE.length),col=Math.floor(Math.random()*PALETTE.length),loop=0;
+  var now=DEMO_CMP[ci].concat(DEMO_MINE[mi]);
+  function paint(){scr.setAttribute("fill",PALETTE[col]);scr.setAttribute("stroke",PALETTE[col])}
+  paint();set(now);
+  function step(){
+    if(!s.isConnected)return;
+    ci=another(DEMO_CMP.length,ci);col=another(PALETTE.length,col);if(++loop%3===0)mi=another(DEMO_MINE.length,mi);
+    var from=now,to=DEMO_CMP[ci].concat(DEMO_MINE[mi]),t0=performance.now(),dur=reduce?0:467;
+    paint();
+    (function frame(t){var k=dur?Math.min(1,(t-t0)/dur):1;k=k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2;
+      now=from.map(function(a,i){return a+(to[i]-a)*k});set(now);if(k<1&&s.isConnected)requestAnimationFrame(frame)})(t0);
+    setTimeout(step,reduce?4000:2600);
+  }
+  setTimeout(step,reduce?4000:2600);
+  return s;
+}
+// a dimension line with end ticks and its size in mm: h(x1, x2, y, mm, below) or v(x, y1, y2, mm, toLeft)
+function demoDim(s,c,tc){
+  var w={stroke:c,"stroke-width":2},l=el("line",w,s),a=el("line",w,s),b=el("line",w,s),
+    t=el("text",{"font-size":34,"font-weight":700,fill:tc,"font-family":"inherit"},s);
+  function at(e,x1,y1,x2,y2){e.setAttribute("x1",x1);e.setAttribute("y1",y1);e.setAttribute("x2",x2);e.setAttribute("y2",y2)}
+  return {
+    h:function(x1,x2,y,mm,below){at(l,x1,y,x2,y);at(a,x1,y-10,x1,y+10);at(b,x2,y-10,x2,y+10);
+      t.setAttribute("x",(x1+x2)/2);t.setAttribute("y",below?y+42:y-16);t.setAttribute("text-anchor","middle");t.textContent=Math.round(mm)+" MM"},
+    v:function(x,y1,y2,mm,toLeft){at(l,x,y1,x,y2);at(a,x-10,y1,x+10,y1);at(b,x-10,y2,x+10,y2);
+      t.setAttribute("x",x+(toLeft?-14:14));t.setAttribute("y",(y1+y2)/2+12);t.setAttribute("text-anchor",toLeft?"end":"start");t.textContent=Math.round(mm)+" MM"}
+  };
+}
 // shown in place of the panels until a monitor is chosen
 function emptyState(){
-  var d=document.createElement("div");d.className="empty";
+  var d=document.createElement("div");d.className="empty";d.appendChild(demo());
   var t=document.createElement("b");t.textContent="Choose your monitor to start";d.appendChild(t);
   var p=document.createElement("span");p.textContent="Then add monitors to compare it with, side by side and to scale.";d.appendChild(p);
   var b=document.createElement("button");b.type="button";b.className="field";b.textContent="CHOOSE YOUR MONITOR";b.onclick=function(){mineBtn.click()};d.appendChild(b);
@@ -370,11 +433,51 @@ function renderPanels(){
 // pickers: an overlay with search, filters and a 4-column grid of cards; each card previews its monitor against yours
 var mineBtn=document.getElementById("mineBtn"), pick=document.getElementById("pick"), pq=document.getElementById("pq"), pgrid=document.getElementById("pgrid"), pfilter=document.getElementById("pfilter");
 var cmpBtn=document.getElementById("cmpBtn"), cpick=document.getElementById("cpick"), cq=document.getElementById("cq"), cgrid=document.getElementById("cgrid"), cfilter=document.getElementById("cfilter"), cOrder=[];
-var FILTERS=[["all","All"],["flat","Flat"],["curved","Curved"],["u80","Under 80 cm"]], flt={p:"all",c:"all"};
+var FILTERS=[["all","All"],["flat","Flat"],["curved","Curved"]], flt={p:"all",c:"all"};
 function showMine(){var y=mine();mineBtn.classList.toggle("unset",!y);mineBtn.querySelector(".sw").style.background=y?MINE_COLOR:"";mineBtn.querySelector(".nm").textContent=y?y.name:"Choose your monitor"}
-function matches(m,term,f){
-  if(term&&m.hay.indexOf(term)<0)return false;
-  return f==="flat"?!m.R:f==="curved"?!!m.R:f==="u80"?m.bw<800:true;
+// search: every word must appear somewhere, in any order. A number followed by inch, in or " is a diagonal
+// (27" finds 27-inch monitors, not every size with 27 in it); the rest are squashed text
+function words(term){
+  return term.toLowerCase().replace(/(\d)\s*(inches|inch|in|"|”)(?![a-z])/g,"$1\"").split(/\s+/).map(function(w){
+    var d=w.match(/^(\d+(?:\.\d+)?)"$/);return d?{diag:+d[1]}:squash(w)}).filter(Boolean);
+}
+// true when b is a, or a with one letter changed, added or dropped
+function oneEdit(a,b){
+  if(Math.abs(a.length-b.length)>1)return false;
+  var i=0,j=0,edits=0;
+  while(i<a.length&&j<b.length){
+    if(a[i]===b[j]){i++;j++;continue}
+    if(++edits>1)return false;
+    if(a.length>b.length)i++;else if(a.length<b.length)j++;else{i++;j++}
+  }
+  return edits+(a.length-i)+(b.length-j)<=1;
+}
+function nearIn(hay,w){
+  for(var i=0;i<hay.length;i++)for(var n=w.length-1;n<=w.length+1;n++)if(i+n<=hay.length&&oneEdit(hay.substr(i,n),w))return true;
+  return false;
+}
+// 0 = every word found as typed, 1+ = that many words matched with a typo (only when fuzzy), -1 = no match
+function score(m,ws,fuzzy){
+  var typos=0;
+  for(var k=0;k<ws.length;k++){
+    var w=ws[k];
+    if(w.diag!==undefined){if(m.diag&&Math.abs(m.diag-w.diag)<(w.diag%1?0.05:0.5))continue;return -1}
+    if(m.hay.indexOf(w)>=0)continue;
+    if(fuzzy&&w.length>=5&&nearIn(m.hay,w)){typos++;continue}
+    return -1;
+  }
+  return typos;
+}
+function passes(m,f){return f==="flat"?!m.R:f==="curved"?!!m.R:true}
+// the monitors that match, exact matches first; within a rank the list keeps its own order
+// typos are only forgiven when nothing matches as typed, so "u2724" doesn't pull in every U2722 and U2723
+function search(list,term,f){
+  var ws=words(term);
+  function run(fuzzy){var hits=[];
+    list.forEach(function(m,i){if(!passes(m,f))return;var s=ws.length?score(m,ws,fuzzy):0;if(s>=0)hits.push([s,i,m])});
+    return hits.sort(function(a,b){return a[0]-b[0]||a[1]-b[1]}).map(function(h){return h[2]})}
+  var exact=run(false);
+  return exact.length||!ws.length?exact:run(true);
 }
 function filterBar(box,k,render){
   box.textContent="";
@@ -422,7 +525,7 @@ function pageInto(g,rows,make){
 }
 function renderGrid(){
   var term=pq.value.trim().toLowerCase();
-  pageInto(pgrid,M.filter(function(m){return matches(m,term,flt.p)}),function(m){
+  pageInto(pgrid,search(M,term,flt.p),function(m){
     var cur=m.id===st.mine,c=card(m,cur,!cur);c.setAttribute("aria-current",cur);
     c.onclick=function(){st.mine=m.id;st.show=st.show.filter(function(id){return id!==m.id});pick.close();showMine();renderPicks();draw()};
     return c;
@@ -435,14 +538,16 @@ pick.addEventListener("click",function(e){if(e.target===pick)pick.close()});
 // comparison: cards toggle; selected ones sit first, in the order fixed when it opens
 function cmpCard(m){
   var on=st.compare.indexOf(m.id)>=0,c=card(m,on,true);c.setAttribute("aria-pressed",on);
-  // read the list at click time, so a click never adds a monitor twice; the card is swapped in place, so the grid keeps its scroll
-  c.onclick=function(){var was=st.compare.indexOf(m.id)>=0;st.compare=st.compare.filter(function(id){return id!==m.id});if(!was)st.compare.push(m.id);
+  // read the list at click time, so a click never adds a monitor twice; the card is swapped in place, so the grid keeps its scroll.
+  // a newly added monitor starts ON, so its panel shows straight away
+  c.onclick=function(){var was=st.compare.indexOf(m.id)>=0;st.compare=st.compare.filter(function(id){return id!==m.id});
+    if(!was){st.compare.push(m.id);if(st.show.indexOf(m.id)<0)st.show.push(m.id)}
     renderPicks();c.replaceWith(cmpCard(m));cmpCount();draw()};
   return c;
 }
 function renderCmp(){
   var term=cq.value.trim().toLowerCase();
-  pageInto(cgrid,cOrder.filter(function(m){return m.id!==st.mine&&matches(m,term,flt.c)}),cmpCard);
+  pageInto(cgrid,search(cOrder.filter(function(m){return m.id!==st.mine}),term,flt.c),cmpCard);
   cmpCount();
 }
 function cmpCount(){
@@ -459,15 +564,48 @@ cpick.addEventListener("click",function(e){if(e.target===cpick)cpick.close()});
 indexM();
 showMine();
 renderPicks();
+// the choices and view settings are kept in this browser, so a refresh or a later visit picks up where you left off.
+// Saving starts only once they have been restored, so the empty first render never overwrites them
+var SAVE_KEY="monitor-fit:v1", restored=false, saved=null;
+try{saved=JSON.parse(localStorage.getItem(SAVE_KEY))}catch(e){}
+function save(){
+  if(!restored)return;
+  try{localStorage.setItem(SAVE_KEY,JSON.stringify({
+    st:{mine:st.mine,compare:st.compare,show:st.show,colors:st.colors,pos:st.pos,ghost:st.ghost},
+    ist:{D:ist.D,W:ist.W,back:ist.back,eye:ist.eye,yaw:ist.yaw,ghost:ist.ghost,gaze:ist.gaze}}))}catch(e){}
+}
+// monitors no longer in the catalogue are dropped; the controls are set to match
+function restore(){
+  restored=true;
+  var s=saved&&saved.st,v=saved&&saved.ist;
+  if(s){
+    var known=function(id){return !!MI[id]};
+    st.mine=known(s.mine)?s.mine:null;
+    st.compare=(s.compare||[]).filter(known);
+    st.show=(s.show||[]).filter(function(id){return st.compare.indexOf(id)>=0});
+    st.colors=s.colors||{};
+    if(/^[bt][lcr]$/.test(s.pos))st.pos=s.pos;
+    if(typeof s.ghost==="boolean")st.ghost=s.ghost;
+  }
+  if(v)["D","W","back","eye","yaw","ghost","gaze"].forEach(function(k){if(v[k]!==undefined)ist[k]=v[k]});
+  [].forEach.call(document.getElementById("pos").children,function(b){b.setAttribute("aria-pressed",b.dataset.p===st.pos)});
+  [].forEach.call(document.getElementById("depth").children,function(b){b.setAttribute("aria-pressed",+b.dataset.d===ist.D)});
+  document.getElementById("ghost").checked=st.ghost;
+  document.getElementById("ighost").checked=ist.ghost;
+  document.getElementById("dw").value=ist.W/10;
+  document.getElementById("bk").value=ist.back/10;
+  document.getElementById("eye").value=ist.eye;
+  document.getElementById("yaw").value=ist.yaw;
+  showMine();renderPicks();draw();
+}
 // swap in the full catalogue; opened from disk (file://) the fetch fails and the built-in monitors stay
 fetch("catalogue/index.json").then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(cat){
   // a row's id follows its fields when it isn't the slug of the name
   var f=cat.fields,full=cat.rows.map(function(row){var m={};f.forEach(function(k,i){m[k]=row[i]});
     m.id=row[f.length]||m.name.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
     m.curve=m.R?m.R+"R":"flat";m.res=m.res.replace("x"," × ");return m});
-  if(st.mine&&!full.some(function(m){return m.id===st.mine}))return;
-  M=full;indexM();showMine();renderPicks();draw();
-}).catch(function(){});
+  M=full;indexM();
+}).catch(function(){}).then(restore);
 function draw(){panels.forEach(function(pn){svg=pn.front;drawFront(pn.m,pn.key);drawIso(pn)});syncGaze()}
 var pos=document.getElementById("pos");
 [].forEach.call(pos.children,function(b){b.onclick=function(){st.pos=b.dataset.p;[].forEach.call(pos.children,function(c){c.setAttribute("aria-pressed",c===b)});draw()}});
@@ -553,6 +691,7 @@ function drawIso(pn){
 var depth=document.getElementById("depth");
 // the gaze sliders reach exactly as far as dragging over the screens does, and start at the first panel's gaze
 function syncGaze(){
+  save();
   var gy=document.getElementById("gy"),gp=document.getElementById("gp");
   // the slider values show even while no panel is drawn
   document.getElementById("eyev").textContent=(ist.eye/10)+" cm";
@@ -572,7 +711,7 @@ document.getElementById("dw").oninput=function(e){ist.W=+e.target.value*10;drawI
 document.getElementById("eye").oninput=function(e){ist.eye=+e.target.value;drawIsos()};
 document.getElementById("ighost").onchange=function(e){ist.ghost=e.target.checked;drawIsos()};
 document.getElementById("yaw").oninput=function(e){ist.yaw=+e.target.value;drawIsos()};
-window.addEventListener("pointerup",function(){ist.drag=false});
+window.addEventListener("pointerup",function(){if(ist.drag)save();ist.drag=false});
 document.getElementById("gy").oninput=setGaze;
 document.getElementById("gp").oninput=setGaze;
 document.getElementById("gc").onclick=function(){ist.gaze={};drawIsos()};
