@@ -60,6 +60,8 @@ svg.iso polygon.q{cursor:crosshair}
 .list button{display:flex;align-items:center;gap:10px;min-height:32px;padding:0 12px;border:0;border-bottom:1px solid var(--line);background:var(--card);text-align:left;cursor:pointer}
 .list button:last-child{border-bottom:0}
 .list button .nm{flex:1 1 auto}
+.list button .grip{color:var(--mute);cursor:grab;margin:0 -4px 0 -8px;padding:6px 4px;touch-action:none}
+#picks button.dragging{position:relative;z-index:1;box-shadow:0 4px 12px rgba(0,0,0,.18);cursor:grabbing}
 .list button .st{color:var(--mute)}
 .list button[aria-pressed=true]{background:var(--sel-bg);color:var(--sel-ink)}
 .list button[aria-pressed=true] .st{color:var(--sel-ink)}
@@ -357,21 +359,56 @@ function drawFront(m,key){
 }
 var picks=document.getElementById("picks");
 function sw(m){var s=document.createElement("span");s.className="sw";s.style.background=colorOf(m);return s}
-// the monitors selected for comparison; my monitor is never one of them. Each one toggles its own panel
+// the monitors selected for comparison; my monitor is never one of them. Each one toggles its own panel.
+// The list is in your order (st.compare), and the panels follow it; drag a row, or Alt+↑/↓ on it, to move it
+function listed(){return st.compare.map(byId).filter(function(m){return m&&m.id!==st.mine})}
 function renderPicks(){
   assignColors();
-  var listed=M.filter(function(m){return m.id!==st.mine&&st.compare.indexOf(m.id)>=0});
-  st.show=st.show.filter(function(id){return listed.some(function(m){return m.id===id})});
+  var ls=listed();
+  st.show=st.show.filter(function(id){return ls.some(function(m){return m.id===id})});
   picks.textContent="";
-  listed.forEach(function(m){
-    var on=st.show.indexOf(m.id)>=0,b=document.createElement("button");b.type="button";b.setAttribute("aria-pressed",on);
+  ls.forEach(function(m,i){
+    var on=st.show.indexOf(m.id)>=0,b=document.createElement("button");b.type="button";b.setAttribute("aria-pressed",on);b.dataset.id=m.id;
+    b.title="Drag, or Alt+↑/↓, to reorder";
+    var g=document.createElement("span");g.className="grip";g.setAttribute("aria-hidden","true");g.textContent="⠿";
     var n=document.createElement("span");n.className="nm";n.textContent=m.name;
     var t=document.createElement("span");t.className="st";t.textContent=on?"ON":"OFF";
-    b.appendChild(sw(m));b.appendChild(n);b.appendChild(t);
-    b.onclick=function(){st.show=on?st.show.filter(function(id){return id!==m.id}):st.show.concat(m.id);renderPicks();draw()};
+    b.appendChild(g);b.appendChild(sw(m));b.appendChild(n);b.appendChild(t);
+    b.onclick=function(){if(dragged)return;st.show=on?st.show.filter(function(id){return id!==m.id}):st.show.concat(m.id);renderPicks();draw();refocus(m.id)};
+    b.onkeydown=function(e){var d=e.key==="ArrowUp"?-1:e.key==="ArrowDown"?1:0;if(!e.altKey||!d||!ls[i+d])return;
+      e.preventDefault();var ids=ls.map(function(x){return x.id});ids[i]=ids[i+d];ids[i+d]=m.id;reorder(ids);
+      refocus(m.id)};
+    b.onpointerdown=startDrag;
     picks.appendChild(b);
   });
   renderPanels();
+}
+// the list is rebuilt on every change: keep the keyboard on the same row
+function refocus(id){var b=picks.querySelector('[data-id="'+id+'"]');if(b)b.focus()}
+function reorder(ids){
+  // ids not in the list (your own monitor, if it was once compared) keep their place at the end
+  st.compare=ids.concat(st.compare.filter(function(id){return ids.indexOf(id)<0}));
+  renderPicks();draw();
+}
+// pointer drag: the row follows the pointer, and swaps with a neighbour once it passes that neighbour's middle
+var dragged=false;
+function startDrag(e){
+  // on touch only the grip drags, so swiping over the list still scrolls
+  if(e.button||e.pointerType!=="mouse"&&!e.target.closest(".grip"))return;
+  var row=e.currentTarget,y0=e.clientY,moving=false;dragged=false;
+  function move(ev){
+    if(!moving){if(Math.abs(ev.clientY-y0)<5)return;moving=true;row.classList.add("dragging")}
+    var prev=row.previousElementSibling,next=row.nextElementSibling,r;
+    if(prev&&ev.clientY<(r=prev.getBoundingClientRect()).top+r.height/2)picks.insertBefore(row,prev);
+    else if(next&&ev.clientY>(r=next.getBoundingClientRect()).top+r.height/2)picks.insertBefore(next,row);
+  }
+  function up(){
+    removeEventListener("pointermove",move);removeEventListener("pointerup",up);removeEventListener("pointercancel",up);
+    if(!moving)return;
+    row.classList.remove("dragging");dragged=true;setTimeout(function(){dragged=false});
+    reorder([].map.call(picks.children,function(b){return b.dataset.id}));
+  }
+  addEventListener("pointermove",move);addEventListener("pointerup",up);addEventListener("pointercancel",up);
 }
 // sizes for the empty-state animation, picked from the catalogue: [body w, body h, screen w, screen h] in mm.
 // The commonest real sizes, each at least 28 mm (width/height distance) from every other one in both lists
@@ -460,7 +497,7 @@ function signed(mm){return mm===0?"same":(mm>0?"+":"−")+cm(Math.abs(mm))}
 // one full panel per toggled monitor, in list order; just my monitor when none are toggled
 function renderPanels(){
   var box=document.getElementById("panels"),tpl=document.getElementById("panelTpl"),y=mine();box.textContent="";
-  var ms=M.filter(function(m){return st.show.indexOf(m.id)>=0});if(!ms.length&&y)ms=[y];
+  var ms=listed().filter(function(m){return st.show.indexOf(m.id)>=0});if(!ms.length&&y)ms=[y];
   if(!ms.length){box.classList.remove("multi");box.appendChild(emptyState());panels=[];return}
   // several panels: halves shrink to their drawings so the stack stays compact
   box.classList.toggle("multi",ms.length>1);
