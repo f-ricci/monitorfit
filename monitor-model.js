@@ -169,7 +169,7 @@ function validateMonitor(m) {
 }
 
 /**
- * Turn a catalogue record into the flat shape the drawing code uses (the `M` array in monitor-fit.html).
+ * Turn a catalogue record into the flat shape the drawing code uses (the `M` array in index.html).
  * Returns null when the sizes the drawing needs are missing.
  * @param {Monitor} m
  */

@@ -1,6 +1,6 @@
 # Monitor fit: handoff notes
 
-The prototype is `monitor-fit.html`: one file of plain JavaScript and inline SVG, no dependencies.
+The prototype is `index.html`: one file of plain JavaScript and inline SVG, no dependencies.
 Live version: https://claude.ai/artifact/GSqV4RhXLPcTVMp7DqUtmR
 
 ## What it does

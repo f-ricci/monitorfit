@@ -1,4 +1,4 @@
-// The seven monitors from monitor-fit.html as catalogue records (see monitor-model.js for the types).
+// The seven monitors from index.html as catalogue records (see monitor-model.js for the types).
 // Only the values the page already had are filled in. No source has been checked yet, so `sources` is empty
 // and only values worked out from diagonal and ratio carry provenance ("estimated").
 
