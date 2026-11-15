@@ -26,7 +26,7 @@ const TODAY = new Date().toISOString().slice(0, 10);
 
 // Icecat feature ids (stable across products in category 222, "Computer Monitors")
 const F = {
-  diagonal: 944, resolution: 1585, aspect: 11417, panelType: 15285, antiGlare: 10443, brightness: 36441,
+  diagonal: 944, resolution: 1585, aspect: 11417, panelType: 15285, antiGlare: 10443, brightness: 36441, brightnessPlain: 1389, peak: 36440,
   response: 1516, contrast: 34, refresh: 7450, pixelPitch: 32, ppi: 13246, areaW: 91, areaH: 92, bitDepth: 1550,
   gamutStd: 46927, gamut: 14575, srgb: 28703, curvature: 42456,
   hdmiQty: 3566, hdmiVer: 5452, dpQty: 6611, dpVer: 11111,
@@ -105,7 +105,8 @@ function toMonitor(data, want) {
       curveRadiusMm: curve ? +curve[1] : undefined,
       activeAreaMm: f.mm(F.areaW) && f.mm(F.areaH) ? [f.mm(F.areaW), f.mm(F.areaH)] : undefined,
       pixelPitchMm: pitch > 0 ? pitch : undefined, refreshHz: f.num(F.refresh), responseMs: f.num(F.response),
-      bitDepth: f.num(F.bitDepth), brightnessNits: f.num(F.brightness), contrast: f.str(F.contrast),
+      bitDepth: f.num(F.bitDepth), brightnessNits: f.num(F.brightness) || f.num(F.brightnessPlain), peakNits: f.num(F.peak),
+      contrast: f.str(F.contrast),
       colorGamut: Object.keys(gamut).length ? gamut : undefined,
       coating: f.yes(F.antiGlare) ? "anti-glare" : undefined
     },

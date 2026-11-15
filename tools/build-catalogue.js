@@ -1,6 +1,6 @@
 // Build catalogue/index.json, the compact list the page loads: one row per drawable monitor with only the
-// fields the drawing and the pickers use. Hand-made records (monitors-data.js) come first and keep their ids;
-// an Icecat record with the same id replaces the hand-made values.
+// fields the drawing and the pickers use, sorted by brand and model. Hand-made records (monitors-data.js) keep
+// their ids; an Icecat record for the same monitor replaces the hand-made values.
 //
 // Usage: node tools/build-catalogue.js [icecat file]   (default .cache/icecat/monitors-icecat.js)
 
@@ -12,7 +12,8 @@ const { MONITORS } = require("../monitors-data.js");
 
 const ROOT = path.join(__dirname, "..");
 // the id is left out when it is the slug of the name (all but a few hand-made rows); then it follows the fields
-const FIELDS = ["name", "bw", "bh", "pw", "ph", "sd", "R", "res", "diag", "est"];
+// nits: the highest brightness stated, peak if there is one, else typical (0 = unknown)
+const FIELDS = ["name", "bw", "bh", "pw", "ph", "sd", "R", "res", "diag", "est", "nits"];
 const slug = s => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
 const file = process.argv[2] || path.join(ROOT, ".cache", "icecat", "monitors-icecat.js");
@@ -30,18 +31,20 @@ const hand = MONITORS.map(h => {
   used.add(ice);
   return Object.assign({}, ice, { id: h.id, model: h.model });
 });
-const rest = MONITORS_ICECAT.filter(m => !used.has(m))
+// one alphabetical list: no monitor gets a place at the top for being hand-made
+const all = hand.concat(MONITORS_ICECAT.filter(m => !used.has(m)))
   .sort((a, b) => a.brand.localeCompare(b.brand) || a.model.localeCompare(b.model, "en", { numeric: true }));
 
 // whole millimetres are plenty for drawing and labels
 const r0 = v => Math.round(v);
 const rows = [];
 let skipped = 0;
-for (const m of hand.concat(rest)) {
+for (const m of all) {
   const d = toDrawing(m);
   if (!d) { skipped++; continue; }
   const name = m.model.toLowerCase().startsWith(m.brand.toLowerCase()) ? m.model : m.brand + " " + m.model;
-  const row = [name, r0(d.bw), r0(d.bh), r0(d.pw), r0(d.ph), r0(d.sd), d.R, d.res.replace(" × ", "x"), m.panel.diagonalIn || 0, d.est];
+  const nits = Math.max(m.panel.peakNits || 0, m.panel.brightnessNits || 0);
+  const row = [name, r0(d.bw), r0(d.bh), r0(d.pw), r0(d.ph), r0(d.sd), d.R, d.res.replace(" × ", "x"), m.panel.diagonalIn || 0, d.est, nits];
   if (slug(name) !== d.id) row.push(d.id);
   rows.push(row);
 }

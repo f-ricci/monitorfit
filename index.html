@@ -412,6 +412,21 @@ function emptyState(){
   var b=document.createElement("button");b.type="button";b.className="field";b.textContent="CHOOSE YOUR MONITOR";b.onclick=function(){mineBtn.click()};d.appendChild(b);
   return d;
 }
+// pixels per inch from the resolution and diagonal (0 when either is unknown)
+function ppi(m){var r=(m.res||"").split(" × ");return m.diag&&r.length===2?Math.hypot(+r[0],+r[1])/m.diag:0}
+// the panel header: sizes against yours, the PPI difference, and the brightest the monitor gets
+function headline(m,y){
+  var mine=m.id===st.mine,p=ppi(m),yp=y&&ppi(y),parts=[];
+  if(mine)parts.push("Your monitor",cm(m.bw)+" × "+cm(m.bh));
+  else if(!y)parts.push(cm(m.bw)+" × "+cm(m.bh));
+  else parts.push("vs "+y.name,signed(m.bw-y.bw)+" wide",signed(m.bh-y.bh)+" tall");
+  // against yours: the difference, then this monitor's own value in brackets
+  function delta(v,yv,unit){var d=Math.round(v-yv);return (d===0?"same "+unit:(d>0?"+":"−")+Math.abs(d)+" "+unit)+" ("+Math.round(v)+")"}
+  var vs=y&&!mine;
+  if(p)parts.push(vs&&yp?delta(p,yp,"PPI"):Math.round(p)+" PPI");
+  if(m.nits)parts.push(vs&&y.nits?delta(m.nits,y.nits,"nits max"):m.nits+" nits max");
+  return parts.join(" · ");
+}
 function signed(mm){return mm===0?"same":(mm>0?"+":"−")+cm(Math.abs(mm))}
 // one full panel per toggled monitor, in list order; just my monitor when none are toggled
 function renderPanels(){
@@ -424,7 +439,7 @@ function renderPanels(){
     var n=tpl.content.firstElementChild.cloneNode(true);box.appendChild(n);
     var f=n.querySelector(".front"),is=n.querySelector(".iso");
     n.querySelector(".pid").textContent=String.fromCharCode(65+i%26)+" / "+m.name;
-    n.querySelector(".pdiff").textContent=m.id===st.mine?"Your monitor · "+cm(m.bw)+" × "+cm(m.bh):!y?cm(m.bw)+" × "+cm(m.bh):"vs "+y.name+" · "+signed(m.bw-y.bw)+" wide · "+signed(m.bh-y.bh)+" tall";
+    n.querySelector(".pdiff").textContent=headline(m,y);
     f.setAttribute("aria-label","Front view of "+m.name+" with its dimensions");
     is.setAttribute("aria-label","Axonometric view of the desk with "+m.name+", from the chair");
     return {m:m,front:f,iso:is,key:n.querySelector(".key")};

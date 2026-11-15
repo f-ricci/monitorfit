@@ -18,7 +18,8 @@
  * @property {number} [refreshHz]
  * @property {number} [responseMs]
  * @property {number} [bitDepth]
- * @property {number} [brightnessNits]
+ * @property {number} [brightnessNits] typical
+ * @property {number} [peakNits] highest the maker states, usually for HDR
  * @property {string} [contrast] e.g. "2000:1"
  * @property {string} [hdr] e.g. "DisplayHDR 400"
  * @property {Object<string, number>} [colorGamut] percent per space, e.g. {sRGB: 100, "DCI-P3": 98}
