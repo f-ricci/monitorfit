@@ -273,7 +273,7 @@ function vdim(x,b,t,label,c,toLeft,tc){
 }
 function monitor(m,x,b,ghost){
   var y=-(b+m.bh), foot=b-LIFT, g=el("g",{});
-  if(ghost){el("rect",{x:x,y:y,width:m.bw,height:m.bh,fill:"none",stroke:colorOf(m),"stroke-width":3,"stroke-dasharray":"12 9",opacity:.9},g);return}
+  if(ghost){var gi=(m.bw-m.pw)/2;el("rect",{x:x+gi,y:y+gi,width:m.pw,height:m.ph,fill:"none",stroke:colorOf(m),"stroke-width":3,"stroke-dasharray":"12 9",opacity:.9},g);return}
   var cx=x+m.bw/2;
   el("rect",{x:cx-130,y:-foot-10,width:260,height:10,fill:"var(--bezel)"},g);
   el("rect",{x:cx-30,y:-(b+m.bh*0.55),width:60,height:LIFT+m.bh*0.55-6,fill:"var(--bezel)"},g);
@@ -289,13 +289,13 @@ function drawFront(m,key){
   monitor(m,x,b,false);
   if(st.ghost && m.id!==st.mine) monitor(mine(),-mine().bw/2,LIFT,true);
   // dims
-  var y=mine(), yl=-y.bw/2, yt=LIFT+y.bh, hi=-Math.max(top,yt), L=Math.min(x,yl), R=Math.max(r,-yl);
+  var y=mine(), yl=-y.bw/2, yt=LIFT+y.bh, yi=(y.bw-y.pw)/2, hi=-Math.max(top,yt), L=Math.min(x,yl), R=Math.max(r,-yl);
   // compared monitor on top and right; my monitor, in its own colour, on the bottom and left
   dim(x,r,hi-40,mmL(m.bw));
   vdim(R+30,b,top,mmL(m.bh));
   if(st.ghost && m.id!==st.mine){
-    dim(yl,-yl,Math.max(0,LIFT-b)+40,mmL(y.bw),colorOf(y),true,"var(--mine-ink)");
-    vdim(L-30,LIFT,yt,mmL(y.bh),colorOf(y),true,"var(--mine-ink)");
+    dim(yl+yi,-yl-yi,Math.max(0,LIFT-b)+40,mmL(y.pw),colorOf(y),true,"var(--mine-ink)");
+    vdim(L-30,yt-yi-y.ph,yt-yi,mmL(y.ph),colorOf(y),true,"var(--mine-ink)");
   }
   fit(svg,30);
   // legend: compared monitor solid (top and right sizes), mine dashed (bottom and left sizes)
@@ -305,7 +305,7 @@ function drawFront(m,key){
     sp.appendChild(i);sp.appendChild(document.createTextNode(label));key.appendChild(sp)}
   var both=st.ghost && m.id!==st.mine;
   item(m,false,m.name+(m.id===st.mine?" · yours":"")+" · top + right");
-  if(both)item(y,true,"Yours · bottom + left");
+  if(both)item(y,true,"Your screen · bottom + left");
 }
 var picks=document.getElementById("picks");
 function sw(m){var s=document.createElement("span");s.className="sw";s.style.background=colorOf(m);return s}
@@ -459,8 +459,8 @@ function drawIso(pn){
   inner[0]=[cx-m.pw/2,inner[0][1]];inner[inner.length-1]=[cx+m.pw/2,inner[inner.length-1][1]];
   poly(inner.map(function(p){return [p[0],p[1]+1,topH-side-m.ph]}).concat(inner.slice().reverse().map(function(p){return [p[0],p[1]+1,topH-side]})),{fill:colorOf(m),"fill-opacity":.45,stroke:colorOf(m),"stroke-width":2.5});
   // ghost of my monitor
-  if(ist.ghost && m.id!==st.mine){var g=mine(),gz=ist.back+g.sd*0.6,gx=-g.bw/2,gh0=LIFT,gh1=LIFT+g.bh,gs={fill:"none",stroke:colorOf(g),"stroke-width":3,"stroke-dasharray":"12 9"};
-    poly([[gx,gz,gh0],[gx+g.bw,gz,gh0],[gx+g.bw,gz,gh1],[gx,gz,gh1]],gs);
+  if(ist.ghost && m.id!==st.mine){var g=mine(),gz=ist.back+g.sd*0.6,gx=-g.pw/2,gh1=LIFT+g.bh-(g.bw-g.pw)/2,gh0=gh1-g.ph,gs={fill:"none",stroke:colorOf(g),"stroke-width":3,"stroke-dasharray":"12 9"};
+    poly([[gx,gz,gh0],[gx+g.pw,gz,gh0],[gx+g.pw,gz,gh1],[gx,gz,gh1]],gs);
     poly([[-130,ist.back,0],[130,ist.back,0],[130,ist.back+g.sd,0],[-130,ist.back+g.sd,0]],gs);
     line3([0,gz-40,0],[0,gz-40,gh0],gs);}
   // gaze zones over the panel
