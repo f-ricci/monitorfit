@@ -60,7 +60,8 @@ svg.iso polygon.q{cursor:crosshair}
 .list button{display:flex;align-items:center;gap:10px;min-height:32px;padding:0 12px;border:0;border-bottom:1px solid var(--line);background:var(--card);text-align:left;cursor:pointer}
 .list button:last-child{border-bottom:0}
 .list button .nm{flex:1 1 auto}
-.list button .grip{color:var(--mute);cursor:grab;margin:0 -4px 0 -8px;padding:6px 4px;touch-action:none}
+.list button .grip{display:flex;align-items:center;align-self:stretch;color:var(--mute);cursor:grab;margin:0 -4px 0 -8px;padding:0 4px;touch-action:none}
+.list button .grip svg{display:block}
 #picks button.dragging{position:relative;z-index:1;box-shadow:0 4px 12px rgba(0,0,0,.18);cursor:grabbing}
 .list button .st{color:var(--mute)}
 .list button[aria-pressed=true]{background:var(--sel-bg);color:var(--sel-ink)}
@@ -370,7 +371,10 @@ function renderPicks(){
   ls.forEach(function(m,i){
     var on=st.show.indexOf(m.id)>=0,b=document.createElement("button");b.type="button";b.setAttribute("aria-pressed",on);b.dataset.id=m.id;
     b.title="Drag, or Alt+↑/↓, to reorder";
-    var g=document.createElement("span");g.className="grip";g.setAttribute("aria-hidden","true");g.textContent="⠿";
+    // six dots drawn rather than the ⠿ character, which sits above the middle of the row
+    var g=document.createElement("span");g.className="grip";g.setAttribute("aria-hidden","true");
+    var gs=document.createElementNS(NS,"svg");gs.setAttribute("width",8);gs.setAttribute("height",12);gs.setAttribute("viewBox","0 0 8 12");
+    [[2,2],[6,2],[2,6],[6,6],[2,10],[6,10]].forEach(function(c){el("circle",{cx:c[0],cy:c[1],r:1.2,fill:"currentColor"},gs)});g.appendChild(gs);
     var n=document.createElement("span");n.className="nm";n.textContent=m.name;
     var t=document.createElement("span");t.className="st";t.textContent=on?"ON":"OFF";
     b.appendChild(g);b.appendChild(sw(m));b.appendChild(n);b.appendChild(t);
