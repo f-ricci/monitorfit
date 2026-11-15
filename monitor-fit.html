@@ -20,8 +20,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;heigh
 input[type=range]::-moz-range-track{height:2px;background:var(--line)}
 input[type=range]::-moz-range-progress{height:2px;background:var(--accent)}
 input[type=range]::-moz-range-thumb{width:10px;height:10px;background:var(--accent);border:0;border-radius:0}
-input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px;margin:0}
-.blk.sm input[type=checkbox]{width:12px;height:12px}
+input[type=checkbox]{-webkit-appearance:none;appearance:none;flex:none;width:12px;height:12px;margin:0;border:1px solid var(--shelfline);border-radius:0;background:var(--card);cursor:pointer}
+input[type=checkbox]:hover{border-color:var(--mute)}
+input[type=checkbox]:checked{border-color:var(--accent);background:var(--accent);box-shadow:inset 0 0 0 2px var(--card)}
+input[type=checkbox]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 svg{display:block;width:100%;height:auto}
 svg.iso polygon.q{cursor:crosshair}
 /* top bar */
@@ -222,20 +224,15 @@ svg.hi[width="18"]{width:18px;height:18px}
 </div>
 </main>
 
+<script src="monitor-model.js"></script>
+<script src="monitors-data.js"></script>
 <script>
-var M=[
- {id:"pa27",sd:215,R:0,name:'ProArt 27" 4K',bw:612.2,bh:362.9,pw:596.7,ph:335.7,curve:"flat",res:"3840 × 2160"},
- {id:"pa32",sd:245,R:0,name:'ProArt 32" 4K',bw:727.1,bh:429,pw:708.5,ph:398.5,curve:"flat",res:"3840 × 2160",est:1},
- {id:"lg34",sd:220,R:1800,name:'LG 34U620B-B 34"',bw:809,bh:359,pw:797.2,ph:333.7,curve:"1800R",res:"3440 × 1440"},
- {id:"pa34",sd:240,R:3800,name:'ProArt PA34VCNV 34"',bw:817.2,bh:369.7,pw:799.8,ph:334.8,curve:"3800R",res:"3440 × 1440"},
- {id:"d40",sd:252.8,R:2500,name:'Dell U4025QW 40"',bw:946.6,bh:419.1,pw:929,ph:392,curve:"2500R",res:"5120 × 2160"},
- {id:"lg49",sd:260,R:3800,name:'LG 49U950A 49"',bw:1215.1,bh:365.7,pw:1198,ph:337,curve:"3800R",res:"5120 × 1440"},
- {id:"d52",sd:255,R:4200,name:'Dell U5226KW 52"',bw:1223.3,bh:529.1,pw:1207,ph:503,curve:"4200R",res:"6144 × 2560"}
-];
+// monitors come from the catalogue (monitors-data.js), flattened to what the drawing needs
+var M=MONITORS.map(toDrawing).filter(Boolean);
 var LIFT=92;
 // my monitor keeps one colour; compared monitors draw from a palette of 30 distinct colours (Glasbey)
 var MINE_COLOR="#C2459B", PALETTE=["#d60000","#8c3bff","#018700","#00acc6","#97ff00","#ff7ed1","#6b004f","#ffa52f","#573b00","#005659","#0000dd","#00fdcf","#a17569","#bcb6ff","#95b577","#002e6b","#645474","#790000","#0774d8","#fdf490","#004b00","#8e7900","#ff7266","#edb8b8","#5d7e66","#9ae4ff","#eb0077","#a57bb8","#5900a3","#03c600"];
-var st={show:["pa32"],colors:{},mine:"pa27",compare:M.map(function(m){return m.id}),pos:"bc",ghost:true};
+var st={show:["asus-proart-32-4k"],colors:{},mine:"asus-pa279crv",compare:M.map(function(m){return m.id}),pos:"bc",ghost:true};
 var NS="http://www.w3.org/2000/svg", svg=null, panels=[];
 function el(t,a,p){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);(p||svg).appendChild(e);return e}
 function tx(x,y,s,a){var e=el("text",Object.assign({x:x,y:y,"font-size":22,fill:"var(--mute)","font-family":"inherit"},a||{}));e.textContent=s;return e}
